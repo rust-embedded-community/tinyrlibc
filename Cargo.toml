@@ -1,0 +1,10 @@
+[package]
+name = "tinyrlibc"
+version = "0.1.0"
+authors = ["Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"]
+edition = "2018"
+description = "Tiny, incomplete C library for bare-metal targets, written in Stable (but Unsafe) Rust"
+license-file = "LICENCES.md"
+readme = "README.md"
+
+[dependencies]
