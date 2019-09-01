@@ -31,11 +31,51 @@ pub use self::strstr::strstr;
 mod atoi;
 pub use self::atoi::atoi;
 
-// TODO: Add cfg defines / work these out for platforms other than armv6/7/8m
+mod itoa;
+pub use self::itoa::itoa;
 
+mod snprintf;
+
+/// `long long int` is always 64-bits long.
 pub type CLongLong = i64;
+
+/// `unsigned long long int` is always 64-bits long.
+pub type CULongLong = i64;
+
+#[cfg(feature = "lp64")]
+/// The `lp64` feature means we assume `long int` is 64-bits.
+pub type CLong = i64;
+
+#[cfg(feature = "lp64")]
+/// The `lp64` feature means we assume `unsigned long int` is 64-bits.
+pub type CULong = u64;
+
+#[cfg(not(feature = "lp64"))]
+/// We assume `long int` is 32-bits.
 pub type CLong = i32;
+
+#[cfg(not(feature = "lp64"))]
+/// We assume `unsigned long int` is 32-bits.
+pub type CULong = u32;
+
+#[cfg(feature = "lp32")]
+/// The `lp32` feature means we assume `int` is 16-bits.
+pub type CInt = i16;
+
+#[cfg(feature = "lp32")]
+/// The `lp32` feature means we assume `unsigned int` is 16-bits.
+pub type CUInt = u16;
+
+#[cfg(not(feature = "lp32"))]
+/// We assume `int` is 32-bits.
 pub type CInt = i32;
+
+#[cfg(not(feature = "lp32"))]
+/// We assume `unsigned int` is 32-bits.
+pub type CUInt = u32;
+
+/// Represents an 8-bit `char`. Rust does not (and will never) support
+/// platforms where `char` is not 8-bits long.
 pub type CChar = u8;
 
 /// This allows you to iterate a null-terminated string in a relatively simple

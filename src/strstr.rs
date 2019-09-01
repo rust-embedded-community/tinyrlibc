@@ -3,14 +3,11 @@
 //! Copyright (c) Jonathan 'theJPster' Pallant 2019
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::CStringIter;
+use crate::{CChar, CStringIter};
 
 /// Rust implementation of C library function `strstr`
 #[no_mangle]
-pub unsafe extern "C" fn strstr(
-    haystack: *const crate::CChar,
-    needle: *const crate::CChar,
-) -> *const crate::CChar {
+pub unsafe extern "C" fn strstr(haystack: *const CChar, needle: *const CChar) -> *const CChar {
     if *needle.offset(0) == 0 {
         return haystack;
     }

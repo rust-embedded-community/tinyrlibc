@@ -9,6 +9,19 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 ## Implemented so far
 
 * strol
+* atoi
+* strcmp
+* strncmp
+* strlen
+* strtol
+* strstr
+* snprintf
+* vsnprintf
+
+## Non-standard helper functions
+
+* itoa
+* utoa
 
 ## To Do
 
