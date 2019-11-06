@@ -28,6 +28,9 @@ pub use self::strtol::strtol;
 mod strstr;
 pub use self::strstr::strstr;
 
+mod strchr;
+pub use self::strchr::strchr;
+
 mod atoi;
 pub use self::atoi::atoi;
 
@@ -81,27 +84,27 @@ pub type CChar = u8;
 /// This allows you to iterate a null-terminated string in a relatively simple
 /// way.
 pub struct CStringIter {
-    ptr: *const CChar,
-    idx: isize,
+	ptr: *const CChar,
+	idx: isize,
 }
 
 impl CStringIter {
-    /// Create a new iterator from a pointer to a null-terminated string. The
-    /// behaviour is undefined if the string is not null-terminated.
-    pub fn new(s: *const CChar) -> CStringIter {
-        CStringIter { ptr: s, idx: 0 }
-    }
+	/// Create a new iterator from a pointer to a null-terminated string. The
+	/// behaviour is undefined if the string is not null-terminated.
+	pub fn new(s: *const CChar) -> CStringIter {
+		CStringIter { ptr: s, idx: 0 }
+	}
 }
 
 impl core::iter::Iterator for CStringIter {
-    type Item = CChar;
-    fn next(&mut self) -> Option<Self::Item> {
-        let c = unsafe { *self.ptr.offset(self.idx) };
-        if c == 0 {
-            None
-        } else {
-            self.idx += 1;
-            Some(c)
-        }
-    }
+	type Item = CChar;
+	fn next(&mut self) -> Option<Self::Item> {
+		let c = unsafe { *self.ptr.offset(self.idx) };
+		if c == 0 {
+			None
+		} else {
+			self.idx += 1;
+			Some(c)
+		}
+	}
 }
