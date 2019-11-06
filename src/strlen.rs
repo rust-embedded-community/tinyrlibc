@@ -34,5 +34,4 @@ mod test {
     fn test3() {
         assert_eq!(unsafe { strlen(b"X\0" as *const CChar) }, 1);
     }
-
 }

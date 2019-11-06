@@ -28,6 +28,9 @@ pub use self::strtol::strtol;
 mod strstr;
 pub use self::strstr::strstr;
 
+mod strchr;
+pub use self::strchr::strchr;
+
 mod atoi;
 pub use self::atoi::atoi;
 
