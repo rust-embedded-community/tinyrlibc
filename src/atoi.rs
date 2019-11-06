@@ -16,12 +16,12 @@ use crate::{strtol, CChar, CInt, CLong};
 /// ```
 #[no_mangle]
 pub unsafe extern "C" fn atoi(s: *const CChar) -> CInt {
-    let result = strtol(s);
-    if result > CInt::max_value() as CLong {
-        CInt::max_value()
-    } else if result < CInt::min_value() as CLong {
-        CInt::min_value()
-    } else {
-        result as CInt
-    }
+	let result = strtol(s);
+	if result > CInt::max_value() as CLong {
+		CInt::max_value()
+	} else if result < CInt::min_value() as CLong {
+		CInt::min_value()
+	} else {
+		result as CInt
+	}
 }

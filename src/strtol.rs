@@ -13,55 +13,55 @@ use crate::{CChar, CLong, CStringIter};
 /// function returns zero.
 #[no_mangle]
 pub unsafe extern "C" fn strtol(s: *const CChar) -> CLong {
-    let mut result: CLong = 0;
-    for c in CStringIter::new(s) {
-        if c >= b'0' && c <= b'9' {
-            result *= 10;
-            result += (c - b'0') as CLong;
-        } else {
-            break;
-        }
-    }
-    result
+	let mut result: CLong = 0;
+	for c in CStringIter::new(s) {
+		if c >= b'0' && c <= b'9' {
+			result *= 10;
+			result += (c - b'0') as CLong;
+		} else {
+			break;
+		}
+	}
+	result
 }
 
 #[cfg(test)]
 mod test {
-    use super::strtol;
+	use super::strtol;
 
-    #[test]
-    fn empty() {
-        let result = unsafe { strtol(b"\0".as_ptr()) };
-        assert_eq!(result, 0);
-    }
+	#[test]
+	fn empty() {
+		let result = unsafe { strtol(b"\0".as_ptr()) };
+		assert_eq!(result, 0);
+	}
 
-    #[test]
-    fn non_digit() {
-        let result = unsafe { strtol(b"1234x\0".as_ptr()) };
-        assert_eq!(result, 1234);
-    }
+	#[test]
+	fn non_digit() {
+		let result = unsafe { strtol(b"1234x\0".as_ptr()) };
+		assert_eq!(result, 1234);
+	}
 
-    #[test]
-    fn bad_number() {
-        let result = unsafe { strtol(b"x\0".as_ptr()) };
-        assert_eq!(result, 0);
-    }
+	#[test]
+	fn bad_number() {
+		let result = unsafe { strtol(b"x\0".as_ptr()) };
+		assert_eq!(result, 0);
+	}
 
-    #[test]
-    fn one() {
-        let result = unsafe { strtol(b"1\0".as_ptr()) };
-        assert_eq!(result, 1);
-    }
+	#[test]
+	fn one() {
+		let result = unsafe { strtol(b"1\0".as_ptr()) };
+		assert_eq!(result, 1);
+	}
 
-    #[test]
-    fn hundredish() {
-        let result = unsafe { strtol(b"123\0".as_ptr()) };
-        assert_eq!(result, 123);
-    }
+	#[test]
+	fn hundredish() {
+		let result = unsafe { strtol(b"123\0".as_ptr()) };
+		assert_eq!(result, 123);
+	}
 
-    #[test]
-    fn big_long() {
-        let result = unsafe { strtol(b"2147483647\0".as_ptr()) };
-        assert_eq!(result, 2147483647);
-    }
+	#[test]
+	fn big_long() {
+		let result = unsafe { strtol(b"2147483647\0".as_ptr()) };
+		assert_eq!(result, 2147483647);
+	}
 }

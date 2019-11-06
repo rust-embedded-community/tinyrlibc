@@ -9,46 +9,46 @@ use crate::{CChar, CInt};
 /// (core::ptr::null()) gives undefined behaviour.
 #[no_mangle]
 pub unsafe extern "C" fn strncmp(s1: *const CChar, s2: *const CChar, n: usize) -> crate::CInt {
-    for i in 0..n as isize {
-        let s1_i = s1.offset(i);
-        let s2_i = s2.offset(i);
+	for i in 0..n as isize {
+		let s1_i = s1.offset(i);
+		let s2_i = s2.offset(i);
 
-        let val = *s1_i as CInt - *s2_i as CInt;
-        if val != 0 || *s1_i == 0 {
-            return val;
-        }
-    }
-    0
+		let val = *s1_i as CInt - *s2_i as CInt;
+		if val != 0 || *s1_i == 0 {
+			return val;
+		}
+	}
+	0
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
+	use super::*;
 
-    #[test]
-    fn matches() {
-        let a = b"123\0";
-        let b = b"1234\0";
-        let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
-        // Match!
-        assert_eq!(result, 0);
-    }
+	#[test]
+	fn matches() {
+		let a = b"123\0";
+		let b = b"1234\0";
+		let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
+		// Match!
+		assert_eq!(result, 0);
+	}
 
-    #[test]
-    fn no_match() {
-        let a = b"123\0";
-        let b = b"x1234\0";
-        let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
-        // No match, first string first
-        assert!(result < 0);
-    }
+	#[test]
+	fn no_match() {
+		let a = b"123\0";
+		let b = b"x1234\0";
+		let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
+		// No match, first string first
+		assert!(result < 0);
+	}
 
-    #[test]
-    fn no_match2() {
-        let a = b"bbbbb\0";
-        let b = b"aaaaa\0";
-        let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
-        // No match, second string first
-        assert!(result > 0);
-    }
+	#[test]
+	fn no_match2() {
+		let a = b"bbbbb\0";
+		let b = b"aaaaa\0";
+		let result = unsafe { strncmp(a.as_ptr(), b.as_ptr(), 3) };
+		// No match, second string first
+		assert!(result > 0);
+	}
 }
