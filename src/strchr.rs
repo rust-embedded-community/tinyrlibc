@@ -10,7 +10,7 @@ use crate::{CChar, CInt};
 pub unsafe extern "C" fn strchr(haystack: *const CChar, needle: CInt) -> *const CChar {
 	for idx in 0.. {
 		let ptr = haystack.offset(idx);
-		if needle == (*ptr) as i32 {
+		if needle == (*ptr) as CInt {
 			return ptr;
 		}
 		if (*ptr) == 0 {
