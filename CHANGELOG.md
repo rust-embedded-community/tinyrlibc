@@ -16,7 +16,7 @@
 
 * [#1] - Add `strchr`
 
-[#5]: https://github.com/rust-embedded-community/tinyrlibc/pull/1
+[#1]: https://github.com/rust-embedded-community/tinyrlibc/pull/1
 
 ## v0.1.2 (2019-09-01)
 
