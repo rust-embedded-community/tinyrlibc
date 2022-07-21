@@ -13,7 +13,7 @@ pub unsafe extern "C" fn strcpy(dest: *mut CChar, src: *const CChar) -> *const C
 	loop {
 		*dest.offset(i) = *src.offset(i);
 
-		if *src.offset(i) == '\0' as u8 {
+		if *src.offset(i) == b'\0' {
 			break;
 		}
 

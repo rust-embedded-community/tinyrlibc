@@ -1,5 +1,3 @@
-use cc;
-
 fn main() {
 	// Build our snprintf substitute (which has to be C as Rust doesn't do varargs)
 	cc::Build::new()
