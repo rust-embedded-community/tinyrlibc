@@ -22,6 +22,9 @@ pub use self::strncmp::strncmp;
 mod strncpy;
 pub use self::strncpy::strncpy;
 
+mod strcpy;
+pub use self::strcpy::strcpy;
+
 mod strlen;
 pub use self::strlen::strlen;
 
