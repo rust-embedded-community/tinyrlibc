@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+* [#7] - Add `strtoul` and `strcpy`
+
+[#7]: https://github.com/rust-embedded-community/tinyrlibc/pull/7
+
 ## v0.2.2 (2022-03-17)
 
 * [#5] - Swap `i32` to `CInt` in `strchr`.
