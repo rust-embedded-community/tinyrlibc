@@ -19,6 +19,9 @@ pub use self::strcmp::strcmp;
 mod strncmp;
 pub use self::strncmp::strncmp;
 
+mod strcpy;
+pub use self::strcpy::strcpy;
+
 mod strncpy;
 pub use self::strncpy::strncpy;
 
@@ -27,6 +30,9 @@ pub use self::strlen::strlen;
 
 mod strtol;
 pub use self::strtol::strtol;
+
+mod strtoul;
+pub use self::strtoul::strtoul;
 
 mod strstr;
 pub use self::strstr::strstr;
