@@ -12,34 +12,25 @@ use crate::CInt;
 /// ```
 #[no_mangle]
 pub unsafe extern "C" fn abs(i: CInt) -> CInt {
-    i.abs()
+	i.abs()
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
+	use super::*;
 
-    #[test]
-    fn neg() {
-        assert_eq!(
-            unsafe { abs(-2) },
-            2
-        );
-    }
+	#[test]
+	fn neg() {
+		assert_eq!(unsafe { abs(-2) }, 2);
+	}
 
-    #[test]
-    fn pos() {
-        assert_eq!(
-            unsafe { abs(3) },
-            3
-        );
-    }
+	#[test]
+	fn pos() {
+		assert_eq!(unsafe { abs(3) }, 3);
+	}
 
-    #[test]
-    fn zero() {
-        assert_eq!(
-            unsafe { abs(0) },
-            0
-        );
-    }
+	#[test]
+	fn zero() {
+		assert_eq!(unsafe { abs(0) }, 0);
+	}
 }
