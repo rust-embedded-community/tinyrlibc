@@ -13,6 +13,9 @@
 #[allow(unused_imports)]
 use std as core;
 
+mod abs;
+pub use self::abs::abs;
+
 mod strcmp;
 pub use self::strcmp::strcmp;
 

@@ -3,8 +3,10 @@
 ## Unreleased
 
 * [#7] - Add `strtoul` and `strcpy`
+* [#8] - Add `abs`
 
 [#7]: https://github.com/rust-embedded-community/tinyrlibc/pull/7
+[#8]: https://github.com/rust-embedded-community/tinyrlibc/pull/8
 
 ## v0.2.2 (2022-03-17)
 
