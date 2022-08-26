@@ -31,6 +31,9 @@ pub use self::strlen::strlen;
 mod strtol;
 pub use self::strtol::strtol;
 
+mod strtoul;
+pub use self::strtoul::strtoul;
+
 mod strstr;
 pub use self::strstr::strstr;
 
