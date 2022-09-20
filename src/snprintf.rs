@@ -16,7 +16,9 @@ mod test {
 		let mut buf = [b'\0'; 32];
 		assert_eq!(
 			unsafe { snprintf(buf.as_mut_ptr(), buf.len(), "Hi\0".as_ptr()) },
-			2
+			2,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
 		);
 		assert_eq!(
 			unsafe { strcmp(buf.as_ptr() as *const u8, b"Hi\0" as *const u8) },
@@ -37,7 +39,9 @@ mod test {
 					"World\0".as_ptr(),
 				)
 			},
-			13
+			13,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
 		);
 		assert_eq!(
 			unsafe { strcmp(buf.as_ptr() as *const u8, b"Hello, World!\0" as *const u8) },
@@ -86,7 +90,9 @@ mod test {
 					0xcafe1234u64,
 				)
 			},
-			53
+			53,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
 		);
 		assert_eq!(
 			unsafe {
@@ -120,7 +126,9 @@ mod test {
 					0xcafe1234u64,
 				)
 			},
-			53
+			53,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
 		);
 		assert_eq!(
 			unsafe {
@@ -129,6 +137,46 @@ mod test {
 					b"100 100 100 -100 -100 -100 cafe1234 cafe1234 CAFE1234\0" as *const u8,
 				)
 			},
+			0
+		);
+	}
+
+	#[test]
+	fn non_null_terminated_with_length() {
+		let mut buf = [b'\0'; 64];
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%.*s\0".as_ptr(),
+					5,
+					"01234567890123456789\0".as_ptr(),
+				)
+			},
+			5,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe { strcmp(buf.as_ptr() as *const u8, b"01234\0" as *const u8,) },
+			0
+		);
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%.10s\0".as_ptr(),
+					"01234567890123456789\0".as_ptr(),
+				)
+			},
+			10,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe { strcmp(buf.as_ptr() as *const u8, b"0123456789\0" as *const u8,) },
 			0
 		);
 	}
