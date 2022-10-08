@@ -51,43 +51,23 @@ pub use self::itoa::itoa;
 
 mod snprintf;
 
-/// `long long int` is always 64-bits long.
-pub type CLongLong = i64;
+/// `long long int`
+pub type CLongLong = ::core::ffi::c_longlong;
 
-/// `unsigned long long int` is always 64-bits long.
-pub type CULongLong = i64;
+/// `unsigned long long int`
+pub type CULongLong = ::core::ffi::c_ulonglong;
 
-#[cfg(feature = "lp64")]
-/// The `lp64` feature means we assume `long int` is 64-bits.
-pub type CLong = i64;
+/// `long int`
+pub type CLong = ::core::ffi::c_long;
 
-#[cfg(feature = "lp64")]
-/// The `lp64` feature means we assume `unsigned long int` is 64-bits.
-pub type CULong = u64;
+/// `unsigned long int`
+pub type CULong = ::core::ffi::c_ulong;
 
-#[cfg(not(feature = "lp64"))]
-/// We assume `long int` is 32-bits.
-pub type CLong = i32;
+/// `int`
+pub type CInt = ::core::ffi::c_int;
 
-#[cfg(not(feature = "lp64"))]
-/// We assume `unsigned long int` is 32-bits.
-pub type CULong = u32;
-
-#[cfg(feature = "lp32")]
-/// The `lp32` feature means we assume `int` is 16-bits.
-pub type CInt = i16;
-
-#[cfg(feature = "lp32")]
-/// The `lp32` feature means we assume `unsigned int` is 16-bits.
-pub type CUInt = u16;
-
-#[cfg(not(feature = "lp32"))]
-/// We assume `int` is 32-bits.
-pub type CInt = i32;
-
-#[cfg(not(feature = "lp32"))]
-/// We assume `unsigned int` is 32-bits.
-pub type CUInt = u32;
+/// `unsigned int`
+pub type CUInt = ::core::ffi::c_uint;
 
 /// Represents an 8-bit `char`. Rust does not (and will never) support
 /// platforms where `char` is not 8-bits long.
