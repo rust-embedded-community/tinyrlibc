@@ -9,7 +9,7 @@ mod test {
 		fn snprintf(buf: *mut CChar, len: usize, fmt: *const CChar, ...) -> i32;
 	}
 
-	use crate::{strcmp::strcmp, CChar};
+	use crate::{strcmp::strcmp, CChar, CInt, CLong, CLongLong, CUInt, CULong, CULongLong};
 
 	#[test]
 	fn plain_string() {
@@ -66,7 +66,6 @@ mod test {
 	}
 
 	#[test]
-	#[cfg(feature = "lp64")]
 	fn numbers() {
 		let mut buf = [b'\0'; 64];
 		assert_eq!(
@@ -75,49 +74,15 @@ mod test {
 					buf.as_mut_ptr(),
 					buf.len(),
 					"%u %lu %llu %d %ld %lld %x %lx %llX\0".as_ptr(),
-					100u32,
-					100u64,
-					100u64,
-					-100i32,
-					-100i64,
-					-100i64,
-					0xcafe1234u32,
-					0xcafe1234u64,
-					0xcafe1234u64,
-				)
-			},
-			53
-		);
-		assert_eq!(
-			unsafe {
-				strcmp(
-					buf.as_ptr() as *const u8,
-					b"100 100 100 -100 -100 -100 cafe1234 cafe1234 CAFE1234\0" as *const u8,
-				)
-			},
-			0
-		);
-	}
-
-	#[test]
-	#[cfg(not(feature = "lp64"))]
-	fn numbers() {
-		let mut buf = [b'\0'; 64];
-		assert_eq!(
-			unsafe {
-				snprintf(
-					buf.as_mut_ptr(),
-					buf.len(),
-					"%u %lu %llu %d %ld %lld %x %lx %llX\0".as_ptr(),
-					100u32,
-					100u32,
-					100u64,
-					-100i32,
-					-100i32,
-					-100i64,
-					0xcafe1234u32,
-					0xcafe1234u64,
-					0xcafe1234u64,
+					CUInt::from(100u8),
+					CULong::from(100u8),
+					CULongLong::from(100u8),
+					CInt::from(-100i8),
+					CLong::from(-100i8),
+					CLongLong::from(-100i8),
+					CUInt::from(0xcafe1234u32),
+					CULong::from(0xcafe1234u32),
+					CULongLong::from(0xcafe1234u32),
 				)
 			},
 			53
