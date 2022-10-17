@@ -12,13 +12,3 @@ repository = "https://github.com/thejpster/tinyrlibc"
 
 [build-dependencies]
 cc = "1.0"
-
-[features]
-# Set this feature to assume a C `long` is 64-bits (i.e. the C compiler uses
-# the LP64 model, rather than the LLP64, ILP32 or LP32 models). See
-# https://en.cppreference.com/w/cpp/language/types for more details.
-lp64 = []
-# Set this feature to assume a C `int` is 16-bits (i.e. the C compiler uses
-# the LP32 model, rather than the LP64, LLP64 or ILP32 models). See
-# https://en.cppreference.com/w/cpp/language/types for more details.
-lp32 = []
