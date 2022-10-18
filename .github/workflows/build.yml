@@ -1,0 +1,111 @@
+on:
+  push:
+    branches: [ staging, trying, master ]
+  pull_request:
+
+name: Build
+
+#env:
+#  RUSTFLAGS: '--deny warnings' # clippy generates warnings at the moment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: '--deny warnings'
+    strategy:
+      matrix:
+        rust: [stable]
+        TARGET:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - arm-unknown-linux-gnueabi # Raspberry Pi 1
+          - armv7-unknown-linux-gnueabihf # Raspberry Pi 2, 3, etc
+          # Bare metal
+          - thumbv6m-none-eabi
+          - thumbv7em-none-eabi
+          - thumbv7em-none-eabihf
+          - thumbv7m-none-eabi
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.TARGET }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target=${{ matrix.TARGET }}
+
+  test:
+    name: Tests
+    env:
+      RUSTFLAGS: '--deny warnings'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta]
+        TARGET: [x86_64-unknown-linux-gnu]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.TARGET }}
+          override: true
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: test
+          args: --target=${{ matrix.TARGET }}
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: doc
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.64.0 # clippy is too much of a moving target at the moment
+          override: true
+          components: clippy
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
