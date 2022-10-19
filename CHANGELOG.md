@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+* None
+
+## v0.3.0 (2022-10-18)
+
+* [#11] - Switch to `core::ffi` types (requires Rust 1.64)
+* [#10] - Add CI using Github Actions
 * [#7] - Add `strtoul` and `strcpy`
 * [#8] - Add `abs`
 
+[#11]: https://github.com/rust-embedded-community/tinyrlibc/pull/11
+[#10]: https://github.com/rust-embedded-community/tinyrlibc/pull/10
 [#7]: https://github.com/rust-embedded-community/tinyrlibc/pull/7
 [#8]: https://github.com/rust-embedded-community/tinyrlibc/pull/8
 
