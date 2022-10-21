@@ -1,5 +1,13 @@
 use crate::{CChar, CInt, CLong, CULong};
 
+/// Rust implementation of C library function [`strtoul`](https://cplusplus.com/reference/cstdlib/strtoul/).
+///
+/// Passing NULL (core::ptr::null()) gives undefined behaviour.
+/// 
+/// Convert a string to an unsigned long integer.
+///
+/// Ignores `locale' stuff.  Assumes that the upper and lower case
+/// alphabets and digits are each contiguous.
 #[no_mangle]
 pub unsafe extern "C" fn strtoul(
 	nptr: *const CChar,
