@@ -8,13 +8,16 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 
 ## Implemented so far
 
+* abs
 * strol
 * atoi
 * strcmp
 * strncmp
+* strcpy
 * strncpy
 * strlen
 * strtol
+* strtoul
 * strstr
 * strchr
 * snprintf

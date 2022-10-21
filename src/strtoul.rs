@@ -122,9 +122,9 @@ mod tests {
 
 		let results = [
 			(10, unsafe { s.offset(2) }),
-			(u32::MAX, unsafe { s.offset(33) }),
+			(CULong::MAX, unsafe { s.offset(33) }),
 			(30, unsafe { s.offset(36) }),
-			(-40i32 as u32, unsafe { s.offset(40) }),
+			(-40i32 as CULong, unsafe { s.offset(40) }),
 		];
 
 		for (result_number, result_ptr) in results {
@@ -144,7 +144,7 @@ mod tests {
 		assert_eq!(unsafe { strtoul(b"0X00\0".as_ptr(), null_mut(), 0) }, 0x00);
 		assert_eq!(
 			unsafe { strtoul(b"-0x123456F\0".as_ptr(), null_mut(), 0) },
-			(-0x123456Fi32) as u32
+			(-0x123456Fi32) as _
 		);
 	}
 }

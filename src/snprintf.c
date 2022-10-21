@@ -65,7 +65,7 @@ extern int32_t utoa(uint64_t i, char* s, size_t s_len, uint8_t radix);
 /**
  * This is provided by `strtoul.rs`. It converts a string to a long.
  */
-extern unsigned long int strtoul(const char* str, char** endptr, int base);
+extern unsigned long int strtoul(const char* str, const char* restrict* endptr, int base);
 
 /* ======================================================================== *
  *
@@ -329,7 +329,7 @@ int vsnprintf(
                   write_output(*s, str, size, &written);
 
                   s++;
-                  if (precision != -1) {
+                  if (precision != (unsigned long)-1) {
                      count--;
                   }
                }
