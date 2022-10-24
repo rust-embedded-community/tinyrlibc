@@ -128,7 +128,11 @@ pub unsafe extern "C" fn strtoul(
 }
 
 fn isspace(argument: CChar) -> bool {
-	const SPACE_CHARACTERS: [u8; 6] = [b' ', b'\n', b'\t', b'v', b'f', b'r'];
+	// Rust doesn't support "\v"
+	const VERTICAL_TAB: u8 = 0x0B;
+	// Rust doesn't support "\f"
+	const FEED: u8 = 0x0C;
+	const SPACE_CHARACTERS: [u8; 6] = [b' ', b'\n', b'\t', VERTICAL_TAB, FEED, b'\r'];
 	SPACE_CHARACTERS
 		.into_iter()
 		.any(|space_char| argument == space_char)
