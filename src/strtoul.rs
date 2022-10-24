@@ -25,16 +25,15 @@
 //! LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 //! OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 //! SUCH DAMAGE.
-//! 
+//!
 //! Translated from https://github.com/gcc-mirror/gcc/blob/97d1ed67fc6a5773c8c00875bfa3616a457cf5f9/libiberty/strtoul.c
-
 
 use crate::{CChar, CInt, CLong, CULong};
 
 /// Rust implementation of C library function [`strtoul`](https://cplusplus.com/reference/cstdlib/strtoul/).
 ///
 /// Passing NULL (core::ptr::null()) gives undefined behaviour.
-/// 
+///
 /// Convert a string to an unsigned long integer.
 ///
 /// Ignores `locale' stuff.  Assumes that the upper and lower case
