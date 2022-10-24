@@ -10,9 +10,9 @@ use crate::{strtol, CChar, CInt, CLong};
 ///
 /// ```
 /// use tinyrlibc::atoi;
-/// assert_eq!(unsafe { atoi(b"123".as_ptr()) }, 123);
-/// assert_eq!(unsafe { atoi(b"123x".as_ptr()) }, 123);
-/// assert_eq!(unsafe { atoi(b"".as_ptr()) }, 0);
+/// assert_eq!(unsafe { atoi(b"123\0".as_ptr()) }, 123);
+/// assert_eq!(unsafe { atoi(b"123x\0".as_ptr()) }, 123);
+/// assert_eq!(unsafe { atoi(b"\0".as_ptr()) }, 0);
 /// ```
 #[no_mangle]
 pub unsafe extern "C" fn atoi(s: *const CChar) -> CInt {
