@@ -133,9 +133,8 @@ fn isspace(argument: CChar) -> bool {
 	// Rust doesn't support "\f"
 	const FEED: u8 = 0x0C;
 	const SPACE_CHARACTERS: [u8; 6] = [b' ', b'\n', b'\t', VERTICAL_TAB, FEED, b'\r'];
-	SPACE_CHARACTERS
-		.into_iter()
-		.any(|space_char| argument == space_char)
+	
+	SPACE_CHARACTERS.contains(&argument)
 }
 
 fn isdigit(argument: CChar) -> bool {
