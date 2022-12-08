@@ -15,7 +15,7 @@ use crate::{CChar, CLong, CStringIter};
 pub unsafe extern "C" fn strtol(s: *const CChar) -> CLong {
 	let mut result: CLong = 0;
 	for c in CStringIter::new(s) {
-		if c >= b'0' && c <= b'9' {
+		if (b'0'..=b'9').contains(&c) {
 			result *= 10;
 			result += (c - b'0') as CLong;
 		} else {

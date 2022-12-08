@@ -17,7 +17,7 @@ pub unsafe extern "C" fn strstr(haystack: *const CChar, needle: *const CChar) ->
 		}
 		let mut len = 0;
 		for (inner_idx, nec) in CStringIter::new(needle).enumerate() {
-			let hsc = *haystack_trim.offset(inner_idx as isize);
+			let hsc = *haystack_trim.add(inner_idx);
 			if hsc != nec {
 				break;
 			}

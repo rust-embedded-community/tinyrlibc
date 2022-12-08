@@ -62,6 +62,11 @@ extern int32_t itoa(int64_t i, char* s, size_t s_len, uint8_t radix);
  */
 extern int32_t utoa(uint64_t i, char* s, size_t s_len, uint8_t radix);
 
+/**
+ * This is provided by `strtoul.rs`. It converts a string to a long.
+ */
+extern unsigned long int strtoul(const char* str, const char* restrict* endptr, int base);
+
 /* ======================================================================== *
  *
  * Public Function Definitions
@@ -91,7 +96,7 @@ extern int32_t utoa(uint64_t i, char* s, size_t s_len, uint8_t radix);
  * - f (decimal floating point)
  * - g (the shorter of %e and %f)
  * - G (the shorter of %E and %f)
- * - qualifiers: L, width, precision, -, +, space-pad, zero-pad, etc
+ * - qualifiers: L, width, (non-string) precision, -, +, space-pad, zero-pad, etc
  *
  * @param str the output buffer to write to
  * @param size the size of the output buffer
@@ -107,6 +112,8 @@ int vsnprintf(
    bool is_escape = false;
    int is_long = 0;
    bool is_size_t = false;
+   unsigned long precision = -1;
+
    while ( *fmt )
    {
       if ( is_escape )
@@ -315,10 +322,38 @@ int vsnprintf(
             // Render %s
             {
                const char *s = va_arg( ap, const char* );
-               for ( const char* p = s; *p != '\0'; p++ )
+               unsigned long count = precision;
+
+               while (count > 0 && *s != '\0')
                {
-                  write_output( *p, str, size, &written );
+                  write_output(*s, str, size, &written);
+
+                  s++;
+                  if (precision != (unsigned long)-1) {
+                     count--;
+                  }
                }
+            }
+            break;
+         case '.':
+            // Render a precision specifier
+            {
+               // Next up is either a number or a '*' that signifies that the number is in the arguments list
+               char next = *++fmt;
+
+               if (next == '*')
+               {
+                  precision = va_arg( ap, int );
+               }
+               else
+               {
+                  precision = strtoul(fmt, &fmt, 10);
+                  // Strtoul sets the fmt pointer to the char after the number,
+                  // however the code expects the char before that.
+                  fmt--;
+               }
+
+               is_escape = true;
             }
             break;
          case '%':
@@ -329,6 +364,11 @@ int vsnprintf(
             break;
          }
          fmt++;
+
+         if (!is_escape) {
+            // Reset precision if it hasn't just been assigned
+            precision = -1;
+         }
       }
       else
       {
