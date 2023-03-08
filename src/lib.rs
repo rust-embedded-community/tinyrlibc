@@ -13,42 +13,67 @@
 #[allow(unused_imports)]
 use std as core;
 
+#[cfg(feature = "abs")]
 mod abs;
+#[cfg(feature = "abs")]
 pub use self::abs::abs;
 
+#[cfg(feature = "strcmp")]
 mod strcmp;
+#[cfg(feature = "strcmp")]
 pub use self::strcmp::strcmp;
 
+#[cfg(feature = "strncmp")]
 mod strncmp;
+#[cfg(feature = "strncmp")]
 pub use self::strncmp::strncmp;
 
+#[cfg(feature = "strcpy")]
 mod strcpy;
+#[cfg(feature = "strcpy")]
 pub use self::strcpy::strcpy;
 
+#[cfg(feature = "strncpy")]
 mod strncpy;
+#[cfg(feature = "strncpy")]
 pub use self::strncpy::strncpy;
 
+#[cfg(feature = "strlen")]
 mod strlen;
+#[cfg(feature = "strlen")]
 pub use self::strlen::strlen;
 
+#[cfg(feature = "strtol")]
 mod strtol;
+#[cfg(feature = "strtol")]
 pub use self::strtol::strtol;
 
+#[cfg(feature = "strtoul")]
 mod strtoul;
+#[cfg(feature = "strtoul")]
 pub use self::strtoul::strtoul;
 
+#[cfg(feature = "strstr")]
 mod strstr;
+#[cfg(feature = "strstr")]
 pub use self::strstr::strstr;
 
+#[cfg(feature = "strchr")]
 mod strchr;
+#[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
 
+#[cfg(feature = "atoi")]
 mod atoi;
+#[cfg(feature = "atoi")]
 pub use self::atoi::atoi;
 
+#[cfg(feature = "itoa")]
 mod itoa;
+#[cfg(feature = "itoa")]
 pub use self::itoa::itoa;
 
+#[cfg(feature = "snprintf")]
 mod snprintf;
 
 /// `long long int`
