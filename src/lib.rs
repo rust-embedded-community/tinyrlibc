@@ -63,10 +63,14 @@ mod strchr;
 #[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
 
-#[cfg(feature = "atoi")]
+#[cfg(any(feature = "atoi", feature = "atol", feature = "atoll"))]
 mod atoi;
 #[cfg(feature = "atoi")]
 pub use self::atoi::atoi;
+#[cfg(feature = "atol")]
+pub use self::atoi::atol;
+#[cfg(feature = "atoll")]
+pub use self::atoi::atoll;
 
 #[cfg(feature = "itoa")]
 mod itoa;
@@ -75,6 +79,63 @@ pub use self::itoa::itoa;
 
 #[cfg(feature = "snprintf")]
 mod snprintf;
+
+#[cfg(feature = "qsort")]
+mod qsort;
+#[cfg(feature = "qsort")]
+pub use self::qsort::qsort;
+
+#[cfg(feature = "qsort_r")]
+mod qsort_r;
+#[cfg(feature = "qsort_r")]
+pub use self::qsort_r::qsort_r;
+
+#[cfg(feature = "atof")]
+mod atof;
+#[cfg(feature = "atof")]
+pub use self::atof::atof;
+
+#[cfg(feature = "strtod")]
+mod strtod;
+#[cfg(feature = "strtod")]
+pub use self::strtod::strtod;
+
+#[cfg(feature = "strtof")]
+mod strtof;
+#[cfg(feature = "strtof")]
+pub use self::strtof::strtof;
+
+#[cfg(feature = "isspace")]
+mod isspace;
+#[cfg(feature = "isspace")]
+pub use self::isspace::isspace;
+
+#[cfg(feature = "isdigit")]
+mod isdigit;
+#[cfg(feature = "isdigit")]
+pub use self::isdigit::isdigit;
+
+#[cfg(feature = "errno")]
+mod errno;
+#[cfg(feature = "errno")]
+pub use self::errno::{errno, set_errno};
+
+#[cfg(feature = "memchr")]
+mod memchr;
+#[cfg(feature = "memchr")]
+pub use self::memchr::memchr;
+
+/// `void`
+pub type CVoid = ::core::ffi::c_void;
+
+/// `size_t`
+pub type CSizeT = usize;
+
+/// `double`
+pub type CDouble = core::ffi::c_double;
+
+/// `float`
+pub type CFloat = core::ffi::c_float;
 
 /// `long long int`
 pub type CLongLong = ::core::ffi::c_longlong;
