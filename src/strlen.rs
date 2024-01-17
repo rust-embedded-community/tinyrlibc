@@ -9,9 +9,8 @@ use crate::CChar;
 #[cfg(feature = "strlen")]
 #[no_mangle]
 pub unsafe extern "C" fn strlen(s: *const CChar) -> usize {
-    r_strlen(s)
+	r_strlen(s)
 }
-
 
 pub unsafe fn r_strlen(mut s: *const CChar) -> usize {
 	let mut result = 0;

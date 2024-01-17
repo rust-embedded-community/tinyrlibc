@@ -9,7 +9,7 @@ use crate::{CChar, CInt};
 #[cfg(feature = "strchr")]
 #[no_mangle]
 pub unsafe extern "C" fn strchr(haystack: *const CChar, needle: CInt) -> *const CChar {
-    r_strchr(haystack, needle)
+	r_strchr(haystack, needle)
 }
 
 pub unsafe fn r_strchr(haystack: *const CChar, needle: CInt) -> *const CChar {

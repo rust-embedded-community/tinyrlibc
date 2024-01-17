@@ -10,7 +10,7 @@ use crate::{CChar, CInt};
 #[cfg(feature = "strncmp")]
 #[no_mangle]
 pub unsafe extern "C" fn strncmp(s1: *const CChar, s2: *const CChar, n: usize) -> crate::CInt {
-    r_strncmp(s1, s2, n)
+	r_strncmp(s1, s2, n)
 }
 
 pub(crate) unsafe fn r_strncmp(s1: *const CChar, s2: *const CChar, n: usize) -> crate::CInt {

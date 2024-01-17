@@ -31,7 +31,7 @@ mod test {
 
 	#[test]
 	fn test1() {
-        assert!(unsafe { r_strcmp(b"Hello\0" as *const CChar, b"Hello\0" as *const CChar) } == 0);
+		assert!(unsafe { r_strcmp(b"Hello\0" as *const CChar, b"Hello\0" as *const CChar) } == 0);
 	}
 
 	#[test]
@@ -39,18 +39,18 @@ mod test {
 		assert!(unsafe { r_strcmp(b"Hello\0" as *const CChar, b"Hello1\0" as *const CChar) } < 0);
 	}
 
-    #[test]
-    fn test3() {
-        assert!(unsafe { r_strcmp(b"Hello1\0" as *const CChar, b"Hello\0" as *const CChar) } > 0);
-    }
+	#[test]
+	fn test3() {
+		assert!(unsafe { r_strcmp(b"Hello1\0" as *const CChar, b"Hello\0" as *const CChar) } > 0);
+	}
 
-    #[test]
-    fn test4() {
-        assert!(unsafe { r_strcmp(b"\0" as *const CChar, b"Hello\0" as *const CChar) } < 0);
-    }
+	#[test]
+	fn test4() {
+		assert!(unsafe { r_strcmp(b"\0" as *const CChar, b"Hello\0" as *const CChar) } < 0);
+	}
 
-    #[test]
-    fn test5() {
-        assert!(unsafe { r_strcmp(b"Hello\0" as *const CChar, b"\0" as *const CChar) } > 0);
-    }
+	#[test]
+	fn test5() {
+		assert!(unsafe { r_strcmp(b"Hello\0" as *const CChar, b"\0" as *const CChar) } > 0);
+	}
 }

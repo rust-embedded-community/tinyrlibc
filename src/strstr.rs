@@ -8,11 +8,14 @@ use crate::{CChar, CStringIter};
 #[cfg(feature = "strstr")]
 #[no_mangle]
 pub unsafe extern "C" fn strstr(haystack: *const CChar, needle: *const CChar) -> *const CChar {
-    r_strstr(haystack, needle)
+	r_strstr(haystack, needle)
 }
 
 /// Rust implementation of C library function `strstr`
-pub(crate) unsafe extern "C" fn r_strstr(haystack: *const CChar, needle: *const CChar) -> *const CChar {
+pub(crate) unsafe extern "C" fn r_strstr(
+	haystack: *const CChar,
+	needle: *const CChar,
+) -> *const CChar {
 	if *needle.offset(0) == 0 {
 		return haystack;
 	}

@@ -1,4 +1,4 @@
-//! Rust implementation of C library function `atof`
+//! Rust implementation of C library function `strtol`
 //!
 //! Original code from the `c-ward` project.
 //! Licensed under the MIT license.
@@ -8,47 +8,63 @@ use crate::{errno::*, CChar, CInt, CIntMax, CLong, CLongLong, CUIntMax, CULong, 
 #[cfg(feature = "atoi")]
 #[no_mangle]
 pub unsafe extern "C" fn atoi(s: *const CChar) -> CInt {
-    r_atoi(s)
+	r_atoi(s)
 }
 
 #[cfg(feature = "strtol")]
 #[no_mangle]
 pub unsafe extern "C" fn strtol(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLong {
-    r_strtol(s, endptr, base)
+	r_strtol(s, endptr, base)
 }
 
 #[cfg(feature = "strtoul")]
 #[no_mangle]
 pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULong {
-    r_strtoul(s, endptr, base)
+	r_strtoul(s, endptr, base)
 }
 
 #[cfg(feature = "strtoll")]
 #[no_mangle]
-pub unsafe extern "C" fn strtoll(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLongLong {
-    r_strtoll(s, endptr, base)
+pub unsafe extern "C" fn strtoll(
+	s: *const CChar,
+	endptr: *mut *mut CChar,
+	base: CInt,
+) -> CLongLong {
+	r_strtoll(s, endptr, base)
 }
 
 #[cfg(feature = "strtoull")]
 #[no_mangle]
-pub unsafe extern "C" fn strtoull(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULongLong {
-    r_strtoull(s, endptr, base)
+pub unsafe extern "C" fn strtoull(
+	s: *const CChar,
+	endptr: *mut *mut CChar,
+	base: CInt,
+) -> CULongLong {
+	r_strtoull(s, endptr, base)
 }
 
 #[cfg(feature = "strtoimax")]
 #[no_mangle]
-pub unsafe extern "C" fn strtoimax(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CIntMax {
-    r_strtoimax(s, endptr, base)
+pub unsafe extern "C" fn strtoimax(
+	s: *const CChar,
+	endptr: *mut *mut CChar,
+	base: CInt,
+) -> CIntMax {
+	r_strtoimax(s, endptr, base)
 }
 
 #[cfg(feature = "strtoumax")]
 #[no_mangle]
-pub unsafe extern "C" fn strtoumax(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CUIntMax {
-    r_strtoumax(s, endptr, base)
+pub unsafe extern "C" fn strtoumax(
+	s: *const CChar,
+	endptr: *mut *mut CChar,
+	base: CInt,
+) -> CUIntMax {
+	r_strtoumax(s, endptr, base)
 }
 
 pub(crate) unsafe fn r_atoi(s: *const CChar) -> CInt {
-    r_strtol(s, core::ptr::null_mut(), 10) as CInt
+	r_strtol(s, core::ptr::null_mut(), 10) as CInt
 }
 
 pub(crate) unsafe fn r_strtol(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLong {
@@ -63,7 +79,11 @@ pub(crate) unsafe fn r_strtoll(s: *const CChar, endptr: *mut *mut CChar, base: C
 	r_strtox(s, endptr, base, CLongLong::MIN, CLongLong::MAX as _) as CLongLong
 }
 
-pub(crate) unsafe fn r_strtoull(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULongLong {
+pub(crate) unsafe fn r_strtoull(
+	s: *const CChar,
+	endptr: *mut *mut CChar,
+	base: CInt,
+) -> CULongLong {
 	r_strtox(s, endptr, base, 0, CULongLong::MAX) as CULongLong
 }
 
@@ -72,7 +92,7 @@ pub(crate) unsafe fn r_strtoimax(s: *const CChar, endptr: *mut *mut CChar, base:
 }
 
 pub(crate) unsafe fn r_strtoumax(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CUIntMax {
-    r_strtox(s, endptr, base, 0, CUIntMax::MAX) as CUIntMax
+	r_strtox(s, endptr, base, 0, CUIntMax::MAX) as CUIntMax
 }
 
 pub(crate) unsafe fn r_strtox(
@@ -243,7 +263,7 @@ mod tests {
 
 	#[test]
 	fn parse_multi_string() {
-		let string  = b"10 200000000000000000000000000000 30 -40\0";
+		let string = b"10 200000000000000000000000000000 30 -40\0";
 
 		let mut s = string.as_ptr() as *mut CChar;
 		let results = [
@@ -256,7 +276,7 @@ mod tests {
 		for (result_number, result_ptr) in results {
 			let number = unsafe { r_strtoul(s, &mut s as *mut _, 10) };
 
-            assert_eq!(s, result_ptr);
+			assert_eq!(s, result_ptr);
 			assert_eq!(number, result_number);
 		}
 	}
@@ -267,7 +287,10 @@ mod tests {
 			unsafe { r_strtoul(b"0xAA123\0".as_ptr(), null_mut(), 0) },
 			0xAA123
 		);
-		assert_eq!(unsafe { r_strtoul(b"0X00\0".as_ptr(), null_mut(), 0) }, 0x00);
+		assert_eq!(
+			unsafe { r_strtoul(b"0X00\0".as_ptr(), null_mut(), 0) },
+			0x00
+		);
 		assert_eq!(
 			unsafe { r_strtoul(b"-0x123456F\0".as_ptr(), null_mut(), 0) },
 			(-0x123456Fi32) as _

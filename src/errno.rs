@@ -4,17 +4,16 @@
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
 #[allow(non_camel_case_types)]
-
 use crate::{CInt, CVoid};
 
 static mut _impure_ptr: *mut CVoid = core::ptr::null_mut();
 
 pub struct Errno {
-    pub errno: CInt,
+	pub errno: CInt,
 }
 
-pub fn errno(errno: CInt) -> Errno{
-    Errno { errno }
+pub fn errno(errno: CInt) -> Errno {
+	Errno { errno }
 }
 
 // TODO: implement errno

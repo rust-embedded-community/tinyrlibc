@@ -13,15 +13,11 @@ use crate::CInt;
 #[cfg(feature = "abs")]
 #[no_mangle]
 pub extern "C" fn abs(i: CInt) -> CInt {
-	i.abs()
+	r_abs(i)
 }
 
 pub(crate) fn r_abs(i: CInt) -> CInt {
-    if i < 0 {
-        -i
-    } else {
-        i
-    }
+	i.abs()
 }
 
 #[cfg(test)]

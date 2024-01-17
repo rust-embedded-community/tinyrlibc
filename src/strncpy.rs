@@ -10,18 +10,14 @@ use crate::CChar;
 #[cfg(feature = "strncpy")]
 #[no_mangle]
 pub unsafe extern "C" fn strncpy(
-    dest: *mut CChar,
-    src: *const CChar,
-    count: usize,
-) -> *const CChar {
-    r_strncpy(dest, src, count)
-}
-
-pub(crate) unsafe fn r_strncpy(
 	dest: *mut CChar,
 	src: *const CChar,
 	count: usize,
 ) -> *const CChar {
+	r_strncpy(dest, src, count)
+}
+
+pub(crate) unsafe fn r_strncpy(dest: *mut CChar, src: *const CChar, count: usize) -> *const CChar {
 	let mut i = 0isize;
 	while i < count as isize {
 		*dest.offset(i) = *src.offset(i);

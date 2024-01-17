@@ -9,9 +9,8 @@ use crate::CChar;
 #[cfg(feature = "strcpy")]
 #[no_mangle]
 pub unsafe extern "C" fn strcpy(dest: *mut CChar, src: *const CChar) -> *const CChar {
-    r_strcpy(dest, src)
+	r_strcpy(dest, src)
 }
-
 
 pub unsafe fn r_strcpy(dest: *mut CChar, src: *const CChar) -> *const CChar {
 	let mut i = 0;
