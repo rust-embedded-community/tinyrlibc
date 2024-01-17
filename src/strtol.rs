@@ -68,11 +68,11 @@ pub(crate) unsafe fn r_atoi(s: *const CChar) -> CInt {
 }
 
 pub(crate) unsafe fn r_strtol(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLong {
-	r_strtox(s, endptr, base, CLong::MIN, CLong::MAX as _) as CLong
+	r_strtox(s, endptr, base, CLong::MIN as _, CLong::MAX as _) as CLong
 }
 
 pub(crate) unsafe fn r_strtoul(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULong {
-	r_strtox(s, endptr, base, 0, CULong::MAX) as CULong
+	r_strtox(s, endptr, base, 0, CULong::MAX as _) as CULong
 }
 
 pub(crate) unsafe fn r_strtoll(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLongLong {
@@ -127,8 +127,7 @@ pub(crate) unsafe fn r_strtox(
 	if base == 0 {
 		if *s == b'0' as CChar {
 			s = s.add(1);
-			if (*s == b'x' as CChar || *s == b'X' as CChar) && (*s.add(1)).is_ascii_hexdigit()
-			{
+			if (*s == b'x' as CChar || *s == b'X' as CChar) && (*s.add(1)).is_ascii_hexdigit() {
 				s = s.add(1);
 				base = 16;
 			} else {
@@ -240,15 +239,15 @@ pub(crate) fn r_isspace(argument: CInt) -> CInt {
 }
 
 pub(crate) fn r_isdigit(argument: CInt) -> CInt {
-    (argument as CChar).is_ascii_digit() as CInt
+	(argument as CChar).is_ascii_digit() as CInt
 }
 
 pub(crate) fn r_isalpha(argument: CInt) -> CInt {
-    (argument as CChar).is_ascii_alphabetic() as CInt
+	(argument as CChar).is_ascii_alphabetic() as CInt
 }
 
 pub(crate) fn r_isupper(argument: CInt) -> CInt {
-    (argument as CChar).is_ascii_uppercase() as CInt
+	(argument as CChar).is_ascii_uppercase() as CInt
 }
 
 #[cfg(test)]
