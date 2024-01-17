@@ -10,9 +10,18 @@ use crate::CInt;
 /// use tinyrlibc::abs;
 /// assert_eq!(abs(-2), 2);
 /// ```
+#[cfg(feature = "abs")]
 #[no_mangle]
 pub extern "C" fn abs(i: CInt) -> CInt {
 	i.abs()
+}
+
+pub(crate) fn r_abs(i: CInt) -> CInt {
+    if i < 0 {
+        -i
+    } else {
+        i
+    }
 }
 
 #[cfg(test)]
@@ -21,16 +30,16 @@ mod test {
 
 	#[test]
 	fn neg() {
-		assert_eq!(abs(-2), 2);
+		assert_eq!(r_abs(-2), 2);
 	}
 
 	#[test]
 	fn pos() {
-		assert_eq!(abs(3), 3);
+		assert_eq!(r_abs(3), 3);
 	}
 
 	#[test]
 	fn zero() {
-		assert_eq!(abs(0), 0);
+		assert_eq!(r_abs(0), 0);
 	}
 }

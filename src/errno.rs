@@ -17,6 +17,7 @@ pub fn errno(errno: CInt) -> Errno{
     Errno { errno }
 }
 
+// TODO: implement errno
 pub fn set_errno(errno: Errno) {}
 
 pub const EPERM: CInt = 1;

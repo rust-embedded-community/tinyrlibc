@@ -7,8 +7,17 @@ use crate::CChar;
 
 /// Rust implementation of C library function `strncmp`. Passing NULL
 /// (core::ptr::null()) gives undefined behaviour.
+#[cfg(feature = "strncpy")]
 #[no_mangle]
 pub unsafe extern "C" fn strncpy(
+    dest: *mut CChar,
+    src: *const CChar,
+    count: usize,
+) -> *const CChar {
+    r_strncpy(dest, src, count)
+}
+
+pub(crate) unsafe fn r_strncpy(
 	dest: *mut CChar,
 	src: *const CChar,
 	count: usize,
@@ -36,7 +45,7 @@ mod test {
 	fn short() {
 		let src = b"hi\0";
 		let mut dest = *b"abcdef"; // no null terminator
-		let result = unsafe { strncpy(dest.as_mut_ptr(), src.as_ptr(), 5) };
+		let result = unsafe { r_strncpy(dest.as_mut_ptr(), src.as_ptr(), 5) };
 		assert_eq!(
 			unsafe { core::slice::from_raw_parts(result, 5) },
 			*b"hi\0\0\0"
@@ -47,7 +56,7 @@ mod test {
 	fn two() {
 		let src = b"hi\0";
 		let mut dest = [0u8; 2]; // no space for null terminator
-		let result = unsafe { strncpy(dest.as_mut_ptr(), src.as_ptr(), 2) };
+		let result = unsafe { r_strncpy(dest.as_mut_ptr(), src.as_ptr(), 2) };
 		assert_eq!(unsafe { core::slice::from_raw_parts(result, 2) }, b"hi");
 	}
 }

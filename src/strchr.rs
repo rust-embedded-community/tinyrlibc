@@ -6,8 +6,13 @@
 use crate::{CChar, CInt};
 
 /// Rust implementation of C library function `strchr`
+#[cfg(feature = "strchr")]
 #[no_mangle]
 pub unsafe extern "C" fn strchr(haystack: *const CChar, needle: CInt) -> *const CChar {
+    r_strchr(haystack, needle)
+}
+
+pub unsafe fn r_strchr(haystack: *const CChar, needle: CInt) -> *const CChar {
 	for idx in 0.. {
 		let ptr = haystack.offset(idx);
 		if needle == (*ptr) as CInt {
@@ -27,35 +32,35 @@ mod test {
 	#[test]
 	fn no_match() {
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { strchr(haystack, b'X' as CInt) };
+		let result = unsafe { r_strchr(haystack, b'X' as CInt) };
 		assert_eq!(result, core::ptr::null());
 	}
 
 	#[test]
 	fn null() {
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { strchr(haystack, 0) };
+		let result = unsafe { r_strchr(haystack, 0) };
 		assert_eq!(result, unsafe { haystack.offset(8) });
 	}
 
 	#[test]
 	fn start() {
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { strchr(haystack, b'h' as CInt) };
+		let result = unsafe { r_strchr(haystack, b'h' as CInt) };
 		assert_eq!(result, haystack);
 	}
 
 	#[test]
 	fn middle() {
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { strchr(haystack, b'y' as CInt) };
+		let result = unsafe { r_strchr(haystack, b'y' as CInt) };
 		assert_eq!(result, unsafe { haystack.offset(2) });
 	}
 
 	#[test]
 	fn end() {
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { strchr(haystack, b'k' as CInt) };
+		let result = unsafe { r_strchr(haystack, b'k' as CInt) };
 		assert_eq!(result, unsafe { haystack.offset(7) });
 	}
 }
