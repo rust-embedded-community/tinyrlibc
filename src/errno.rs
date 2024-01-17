@@ -3,7 +3,6 @@
 //! Author: Gyungmin Myung <gmmyung@kaist.ac.kr>
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-#[allow(non_camel_case_types)]
 use crate::{CInt, CVoid};
 
 #[allow(non_upper_case_globals)]

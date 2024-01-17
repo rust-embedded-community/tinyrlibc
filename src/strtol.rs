@@ -102,7 +102,7 @@ pub(crate) unsafe fn r_strtox(
 	min: CIntMax,
 	max: CUIntMax,
 ) -> CUIntMax {
-	if base < 0 || base > 36 {
+	if !(0..=36).contains(&base) {
 		set_errno(errno(EINVAL));
 		return 0;
 	}
@@ -127,7 +127,7 @@ pub(crate) unsafe fn r_strtox(
 	if base == 0 {
 		if *s == b'0' as CChar {
 			s = s.add(1);
-			if (*s == b'x' as CChar || *s == b'X' as CChar) && (*s.add(1) as u8).is_ascii_hexdigit()
+			if (*s == b'x' as CChar || *s == b'X' as CChar) && (*s.add(1)).is_ascii_hexdigit()
 			{
 				s = s.add(1);
 				base = 16;
@@ -140,7 +140,7 @@ pub(crate) unsafe fn r_strtox(
 	} else if base == 16
 		&& *s == b'0' as CChar
 		&& (*s.add(1) == b'x' as CChar || *s.add(1) == b'X' as CChar)
-		&& (*s.add(2) as u8).is_ascii_hexdigit()
+		&& (*s.add(2)).is_ascii_hexdigit()
 	{
 		s = s.add(2);
 	}
@@ -149,7 +149,7 @@ pub(crate) unsafe fn r_strtox(
 	let mut overflow = false;
 	let mut num: CUIntMax = 0;
 	loop {
-		let digit: CUIntMax = match *s as u8 {
+		let digit: CUIntMax = match *s {
 			x @ b'0'..=b'9' => x - b'0',
 			x @ b'a'..=b'z' => x - b'a' + 10,
 			x @ b'A'..=b'Z' => x - b'A' + 10,
@@ -164,10 +164,8 @@ pub(crate) unsafe fn r_strtox(
 			if (num as CIntMax) < min / base as CIntMax {
 				overflow = true;
 			}
-		} else {
-			if num > max / base {
-				overflow = true;
-			}
+		} else if num > max / base {
+			overflow = true;
 		}
 		num = num.wrapping_mul(base);
 
@@ -242,17 +240,15 @@ pub(crate) fn r_isspace(argument: CInt) -> CInt {
 }
 
 pub(crate) fn r_isdigit(argument: CInt) -> CInt {
-	(b'0'..=b'9').contains(&(argument as CChar)) as CInt
+    (argument as CChar).is_ascii_digit() as CInt
 }
 
 pub(crate) fn r_isalpha(argument: CInt) -> CInt {
-	let argument = argument as CChar;
-	((b'a'..=b'z').contains(&argument) || (b'A'..=b'Z').contains(&argument)) as CInt
+    (argument as CChar).is_ascii_alphabetic() as CInt
 }
 
 pub(crate) fn r_isupper(argument: CInt) -> CInt {
-	let argument = argument as CChar;
-	(b'A'..=b'Z').contains(&argument) as CInt
+    (argument as CChar).is_ascii_uppercase() as CInt
 }
 
 #[cfg(test)]

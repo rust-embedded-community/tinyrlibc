@@ -8,6 +8,7 @@
 //! See each module for its respective licence.
 
 #![cfg_attr(not(test), no_std)]
+#![allow(clippy::missing_safety_doc)]
 
 #[cfg(test)]
 #[allow(unused_imports)]
