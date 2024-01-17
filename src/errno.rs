@@ -6,6 +6,7 @@
 #[allow(non_camel_case_types)]
 use crate::{CInt, CVoid};
 
+#[allow(non_upper_case_globals)]
 static mut _impure_ptr: *mut CVoid = core::ptr::null_mut();
 
 pub struct Errno {
@@ -17,7 +18,7 @@ pub fn errno(errno: CInt) -> Errno {
 }
 
 // TODO: implement errno
-pub fn set_errno(errno: Errno) {}
+pub fn set_errno(_errno: Errno) {}
 
 pub const EPERM: CInt = 1;
 pub const ENOENT: CInt = 2;
