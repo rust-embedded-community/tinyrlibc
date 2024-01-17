@@ -6,7 +6,7 @@
 use crate::{CChar, CInt};
 
 /// Rust implementation of C library function `strcmp`
-#[no_mangle]
+#[cfg_attr(feature = "strcmp", no_mangle)]
 pub unsafe extern "C" fn strcmp(s1: *const CChar, s2: *const CChar) -> CInt {
 	for i in 0.. {
 		let s1_i = s1.offset(i);
@@ -18,4 +18,34 @@ pub unsafe extern "C" fn strcmp(s1: *const CChar, s2: *const CChar) -> CInt {
 		}
 	}
 	0
+}
+
+#[cfg(test)]
+mod test {
+	use super::*;
+
+	#[test]
+	fn test1() {
+		assert!(unsafe { strcmp(b"Hello\0" as *const CChar, b"Hello\0" as *const CChar) } == 0);
+	}
+
+	#[test]
+	fn test2() {
+		assert!(unsafe { strcmp(b"Hello\0" as *const CChar, b"Hello1\0" as *const CChar) } < 0);
+	}
+
+	#[test]
+	fn test3() {
+		assert!(unsafe { strcmp(b"Hello1\0" as *const CChar, b"Hello\0" as *const CChar) } > 0);
+	}
+
+	#[test]
+	fn test4() {
+		assert!(unsafe { strcmp(b"\0" as *const CChar, b"Hello\0" as *const CChar) } < 0);
+	}
+
+	#[test]
+	fn test5() {
+		assert!(unsafe { strcmp(b"Hello\0" as *const CChar, b"\0" as *const CChar) } > 0);
+	}
 }

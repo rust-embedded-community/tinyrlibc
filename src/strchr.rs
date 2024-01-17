@@ -6,7 +6,7 @@
 use crate::{CChar, CInt};
 
 /// Rust implementation of C library function `strchr`
-#[no_mangle]
+#[cfg_attr(feature = "strchr", no_mangle)]
 pub unsafe extern "C" fn strchr(haystack: *const CChar, needle: CInt) -> *const CChar {
 	for idx in 0.. {
 		let ptr = haystack.offset(idx);

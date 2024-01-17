@@ -6,7 +6,7 @@
 use crate::CChar;
 
 /// Rust implementation of C library function `strlen`
-#[no_mangle]
+#[cfg_attr(feature = "strlen", no_mangle)]
 pub unsafe extern "C" fn strlen(mut s: *const CChar) -> usize {
 	let mut result = 0;
 	while *s != 0 {

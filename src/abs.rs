@@ -4,13 +4,8 @@
 
 use crate::CInt;
 
-/// Calculates the integer absolute value
-///
-/// ```
-/// use tinyrlibc::abs;
-/// assert_eq!(abs(-2), 2);
-/// ```
-#[no_mangle]
+/// Rust implementation of C library function `abs`
+#[cfg_attr(feature = "abs", no_mangle)]
 pub extern "C" fn abs(i: CInt) -> CInt {
 	i.abs()
 }

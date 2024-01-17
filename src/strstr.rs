@@ -5,9 +5,13 @@
 
 use crate::{CChar, CStringIter};
 
+
 /// Rust implementation of C library function `strstr`
-#[no_mangle]
-pub unsafe extern "C" fn strstr(haystack: *const CChar, needle: *const CChar) -> *const CChar {
+#[cfg_attr(feature = "strstr", no_mangle)]
+pub unsafe extern "C" fn strstr(
+	haystack: *const CChar,
+	needle: *const CChar,
+) -> *const CChar {
 	if *needle.offset(0) == 0 {
 		return haystack;
 	}

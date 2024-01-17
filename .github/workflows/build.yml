@@ -103,7 +103,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.64.0 # clippy is too much of a moving target at the moment
+          toolchain: 1.75.0 # clippy is too much of a moving target at the moment
           override: true
           components: clippy
       - uses: actions-rs/clippy-check@v1

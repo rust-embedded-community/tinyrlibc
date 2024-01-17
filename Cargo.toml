@@ -9,8 +9,6 @@ readme = "README.md"
 repository = "https://github.com/thejpster/tinyrlibc"
 
 [dependencies]
-libm = "0.2"
-critical-section = "1.1.*"
 
 [build-dependencies]
 cc = "1.0"
@@ -26,22 +24,22 @@ all = [
     "strlen",
     "strtol",
     "strtoul",
+    "strtoll",
+    "strtoull",
+    "strtoimax",
+    "strtoumax",
+    "strtoul",
     "strstr",
     "strchr",
     "atoi",
+    "utoa",
     "itoa",
     "snprintf",
-    "qsort",
-    "qsort_r",
-    "atof",
-    "strtod",
     "errno",
-    "atol",
-    "atoll",
     "isspace",
     "isdigit",
-    "strtof",
-    "memchr",
+    "isalpha",
+    "isupper",
 ]
 abs = []
 strcmp = []
@@ -51,19 +49,18 @@ strncpy = []
 strlen = []
 strtol = []
 strtoul = []
+strtoll = []
+strtoull = []
+strtoimax = []
+strtoumax = []
 strstr = []
 strchr = []
 atoi = []
+utoa = []
 itoa = []
 snprintf = []
-qsort = []
-qsort_r = []
-atof = []
-strtod = []
 errno = []
-atol = []
-atoll = []
 isspace = []
 isdigit = []
-strtof = []
-memchr = []
+isalpha = []
+isupper = []
