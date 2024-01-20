@@ -7,7 +7,7 @@ use crate::{CChar, CStringIter};
 
 
 /// Rust implementation of C library function `strstr`
-#[cfg_attr(feature = "strstr", export_name = "strstr")]
+#[cfg_attr(feature = "strstr", no_mangle)]
 pub unsafe extern "C" fn strstr(
 	haystack: *const CChar,
 	needle: *const CChar,

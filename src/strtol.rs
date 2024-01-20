@@ -164,7 +164,7 @@ pub unsafe fn strtox(
 }
 
 /// Rust implementation of C library function `isspace`
-#[cfg_attr(feature = "isspace", export_name = "isspace")]
+#[cfg_attr(feature = "isspace", no_mangle)]
 pub fn isspace(argument: CInt) -> CInt {
 	match argument as CChar {
 		b' ' | b'\t' | b'\n' | b'\r' | 0x0b | 0x0c => 1,
@@ -173,19 +173,19 @@ pub fn isspace(argument: CInt) -> CInt {
 }
 
 /// Rust implementation of C library function `isdigit`
-#[cfg_attr(feature = "isdigit", export_name = "isdigit")]
+#[cfg_attr(feature = "isdigit", no_mangle)]
 pub fn isdigit(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_digit() as CInt
 }
 
 /// Rust implementation of C library function `isalpha`
-#[cfg_attr(feature = "isalpha", export_name = "isalpha")]
+#[cfg_attr(feature = "isalpha", no_mangle)]
 pub fn isalpha(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_alphabetic() as CInt
 }
 
 /// Rust implementation of C library function `isupper`
-#[cfg_attr(feature = "isupper", export_name = "isupper")]
+#[cfg_attr(feature = "isupper", no_mangle)]
 pub fn isupper(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_uppercase() as CInt
 }

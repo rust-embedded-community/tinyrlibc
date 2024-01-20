@@ -10,7 +10,7 @@ use crate::CInt;
 /// use tinyrlibc::abs;
 /// assert_eq!(abs(-2), 2);
 /// ```
-#[cfg_attr(feature = "abs", export_name = "abs")]
+#[cfg_attr(feature = "abs", no_mangle)]
 pub fn abs(i: CInt) -> CInt {
 	i.abs()
 }

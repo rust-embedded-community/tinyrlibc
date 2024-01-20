@@ -6,7 +6,7 @@ use crate::CChar;
 
 /// Rust implementation of C library function `strcpy`. Passing NULL
 /// (core::ptr::null()) gives undefined behaviour.
-#[cfg_attr(feature = "strcpy", export_name = "strcpy")]
+#[cfg_attr(feature = "strcpy", no_mangle)]
 pub unsafe fn strcpy(dest: *mut CChar, src: *const CChar) -> *const CChar {
 	let mut i = 0;
 	loop {
