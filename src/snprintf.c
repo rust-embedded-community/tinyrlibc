@@ -106,7 +106,7 @@ extern unsigned long int strtoul(const char* str, char** endptr, int base);
  * @return the number of characters written to `str`
  */
 int vsnprintf(
-   char* restrict str, size_t size, const char* restrict fmt, va_list ap )
+   char* restrict str, size_t size, const char* fmt, va_list ap )
 {
    size_t written = 0;
    bool is_escape = false;
@@ -341,15 +341,13 @@ int vsnprintf(
                // Next up is either a number or a '*' that signifies that the number is in the arguments list
                char next = *++fmt;
 
-	       char* fmt = fmt;
-
                if (next == '*')
                {
                   precision = va_arg( ap, int );
                }
                else
                {
-                  precision = strtoul(fmt, &fmt, 10);
+                  precision = strtoul(fmt, (char**) &fmt, 10);
                   // Strtoul sets the fmt pointer to the char after the number,
                   // however the code expects the char before that.
                   fmt--;
