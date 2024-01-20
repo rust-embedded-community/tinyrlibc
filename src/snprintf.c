@@ -65,7 +65,7 @@ extern int32_t utoa(uint64_t i, char* s, size_t s_len, uint8_t radix);
 /**
  * This is provided by `strtoul.rs`. It converts a string to a long.
  */
-extern unsigned long int strtoul(const char* str, const char* restrict* endptr, int base);
+extern unsigned long int strtoul(const char* str, char** endptr, int base);
 
 /* ======================================================================== *
  *
@@ -340,6 +340,8 @@ int vsnprintf(
             {
                // Next up is either a number or a '*' that signifies that the number is in the arguments list
                char next = *++fmt;
+
+	       char* fmt = fmt;
 
                if (next == '*')
                {
