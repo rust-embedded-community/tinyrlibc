@@ -5,14 +5,10 @@
 
 use crate::{CChar, CStringIter};
 
-#[cfg(feature = "strstr")]
-#[no_mangle]
-pub unsafe extern "C" fn strstr(haystack: *const CChar, needle: *const CChar) -> *const CChar {
-	r_strstr(haystack, needle)
-}
 
 /// Rust implementation of C library function `strstr`
-pub(crate) unsafe extern "C" fn r_strstr(
+#[cfg_attr(feature = "strstr", export_name = "strstr")]
+pub unsafe extern "C" fn strstr(
 	haystack: *const CChar,
 	needle: *const CChar,
 ) -> *const CChar {
@@ -46,7 +42,7 @@ mod test {
 	fn no_match() {
 		let needle = b"needle\0".as_ptr();
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { r_strstr(haystack, needle) };
+		let result = unsafe { strstr(haystack, needle) };
 		assert_eq!(result, core::ptr::null());
 	}
 
@@ -54,7 +50,7 @@ mod test {
 	fn start() {
 		let needle = b"hay\0".as_ptr();
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { r_strstr(haystack, needle) };
+		let result = unsafe { strstr(haystack, needle) };
 		assert_eq!(result, haystack);
 	}
 
@@ -62,7 +58,7 @@ mod test {
 	fn middle() {
 		let needle = b"yst\0".as_ptr();
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { r_strstr(haystack, needle) };
+		let result = unsafe { strstr(haystack, needle) };
 		assert_eq!(result, unsafe { haystack.offset(2) });
 	}
 
@@ -70,7 +66,7 @@ mod test {
 	fn end() {
 		let needle = b"stack\0".as_ptr();
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { r_strstr(haystack, needle) };
+		let result = unsafe { strstr(haystack, needle) };
 		assert_eq!(result, unsafe { haystack.offset(3) });
 	}
 
@@ -78,7 +74,7 @@ mod test {
 	fn partial() {
 		let needle = b"haystacka\0".as_ptr();
 		let haystack = b"haystack\0".as_ptr();
-		let result = unsafe { r_strstr(haystack, needle) };
+		let result = unsafe { strstr(haystack, needle) };
 		assert_eq!(result, core::ptr::null());
 	}
 }

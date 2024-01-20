@@ -6,13 +6,8 @@
 use crate::CChar;
 
 /// Rust implementation of C library function `strlen`
-#[cfg(feature = "strlen")]
-#[no_mangle]
-pub unsafe extern "C" fn strlen(s: *const CChar) -> usize {
-	r_strlen(s)
-}
-
-pub unsafe fn r_strlen(mut s: *const CChar) -> usize {
+#[cfg_attr(feature = "strlen", export_name = "strlen")]
+pub unsafe fn strlen(mut s: *const CChar) -> usize {
 	let mut result = 0;
 	while *s != 0 {
 		s = s.offset(1);
@@ -27,16 +22,16 @@ mod test {
 
 	#[test]
 	fn test1() {
-		assert_eq!(unsafe { r_strlen(b"Hello\0" as *const CChar) }, 5);
+		assert_eq!(unsafe { strlen(b"Hello\0" as *const CChar) }, 5);
 	}
 
 	#[test]
 	fn test2() {
-		assert_eq!(unsafe { r_strlen(b"\0" as *const CChar) }, 0);
+		assert_eq!(unsafe { strlen(b"\0" as *const CChar) }, 0);
 	}
 
 	#[test]
 	fn test3() {
-		assert_eq!(unsafe { r_strlen(b"X\0" as *const CChar) }, 1);
+		assert_eq!(unsafe { strlen(b"X\0" as *const CChar) }, 1);
 	}
 }

@@ -5,7 +5,7 @@
 //! This file is Copyright (c) Jonathan 'theJPster' Pallant 2019
 //! Licensed under the Blue Oak Model Licence 1.0.0
 //!
-//! See each module for its respective licence.
+//! See each module for its respective license.
 
 #![cfg_attr(not(test), no_std)]
 #![allow(clippy::missing_safety_doc)]
@@ -14,38 +14,63 @@
 #[allow(unused_imports)]
 use std as core;
 
-mod errno;
-pub use self::errno::*;
-
 mod itoa;
-pub use self::itoa::*;
 
 mod abs;
-pub use self::abs::*;
+#[cfg(feature = "abs")]
+pub use self::abs::abs;
 
 mod strcmp;
-pub use self::strcmp::*;
+#[cfg(feature = "strcmp")]
+pub use self::strcmp::strcmp;
 
 mod strncmp;
-pub use self::strncmp::*;
+#[cfg(feature = "strncmp")]
+pub use self::strncmp::strncmp;
 
 mod strcpy;
-pub use self::strcpy::*;
+#[cfg(feature = "strcpy")]
+pub use self::strcpy::strcpy;
 
 mod strncpy;
-pub use self::strncpy::*;
+#[cfg(feature = "strncpy")]
+pub use self::strncpy::strncpy;
 
 mod strlen;
-pub use self::strlen::*;
+#[cfg(feature = "strlen")]
+pub use self::strlen::strlen;
 
 mod strtol;
-pub use self::strtol::*;
+#[cfg(feature = "atoi")]
+pub use self::strtol::atoi;
+#[cfg(feature = "strtol")]
+pub use self::strtol::strtol;
+#[cfg(feature = "strtoul")]
+pub use self::strtol::strtoul;
+#[cfg(feature = "strtoll")]
+pub use self::strtol::strtoll;
+#[cfg(feature = "strtoull")]
+pub use self::strtol::strtoull;
+#[cfg(feature = "strtoimax")]
+pub use self::strtol::strtoimax;
+#[cfg(feature = "strtoumax")]
+pub use self::strtol::strtoumax;
+#[cfg(feature = "isspace")]
+pub use self::strtol::isspace;
+#[cfg(feature = "isalpha")]
+pub use self::strtol::isalpha;
+#[cfg(feature = "isdigit")]
+pub use self::strtol::isdigit;
+#[cfg(feature = "isupper")]
+pub use self::strtol::isupper;
 
 mod strstr;
-pub use self::strstr::*;
+#[cfg(feature = "strstr")]
+pub use self::strstr::strstr;
 
 mod strchr;
-pub use self::strchr::*;
+#[cfg(feature = "strchr")]
+pub use self::strchr::strchr;
 
 mod snprintf;
 
