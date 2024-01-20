@@ -13,13 +13,13 @@ pub unsafe extern "C" fn atoi(s: *const CChar) -> CInt {
 
 #[cfg(feature = "strtol")]
 #[no_mangle]
-pub unsafe extern "C" fn strtol(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLong {
+pub unsafe extern "C" fn strtol(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLong {
 	r_strtol(s, endptr, base)
 }
 
 #[cfg(feature = "strtoul")]
-#[no_mangle]
-pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULong {
+//#[no_mangle]
+pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CULong {
 	r_strtoul(s, endptr, base)
 }
 
@@ -27,7 +27,7 @@ pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *mut CChar, base:
 #[no_mangle]
 pub unsafe extern "C" fn strtoll(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 ) -> CLongLong {
 	r_strtoll(s, endptr, base)
@@ -37,7 +37,7 @@ pub unsafe extern "C" fn strtoll(
 #[no_mangle]
 pub unsafe extern "C" fn strtoull(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 ) -> CULongLong {
 	r_strtoull(s, endptr, base)
@@ -47,7 +47,7 @@ pub unsafe extern "C" fn strtoull(
 #[no_mangle]
 pub unsafe extern "C" fn strtoimax(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 ) -> CIntMax {
 	r_strtoimax(s, endptr, base)
@@ -57,7 +57,7 @@ pub unsafe extern "C" fn strtoimax(
 #[no_mangle]
 pub unsafe extern "C" fn strtoumax(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 ) -> CUIntMax {
 	r_strtoumax(s, endptr, base)
@@ -67,37 +67,37 @@ pub(crate) unsafe fn r_atoi(s: *const CChar) -> CInt {
 	r_strtol(s, core::ptr::null_mut(), 10) as CInt
 }
 
-pub(crate) unsafe fn r_strtol(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLong {
+pub(crate) unsafe fn r_strtol(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLong {
 	r_strtox(s, endptr, base, CLong::MIN as _, CLong::MAX as _) as CLong
 }
 
-pub(crate) unsafe fn r_strtoul(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CULong {
+pub(crate) unsafe fn r_strtoul(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CULong {
 	r_strtox(s, endptr, base, 0, CULong::MAX as _) as CULong
 }
 
-pub(crate) unsafe fn r_strtoll(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CLongLong {
+pub(crate) unsafe fn r_strtoll(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLongLong {
 	r_strtox(s, endptr, base, CLongLong::MIN, CLongLong::MAX as _) as CLongLong
 }
 
 pub(crate) unsafe fn r_strtoull(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 ) -> CULongLong {
 	r_strtox(s, endptr, base, 0, CULongLong::MAX) as CULongLong
 }
 
-pub(crate) unsafe fn r_strtoimax(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CIntMax {
+pub(crate) unsafe fn r_strtoimax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CIntMax {
 	r_strtox(s, endptr, base, CIntMax::MIN, CIntMax::MAX as _) as CIntMax
 }
 
-pub(crate) unsafe fn r_strtoumax(s: *const CChar, endptr: *mut *mut CChar, base: CInt) -> CUIntMax {
+pub(crate) unsafe fn r_strtoumax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CUIntMax {
 	r_strtox(s, endptr, base, 0, CUIntMax::MAX) as CUIntMax
 }
 
 pub(crate) unsafe fn r_strtox(
 	s: *const CChar,
-	endptr: *mut *mut CChar,
+	endptr: *mut *const CChar,
 	base: CInt,
 	min: CIntMax,
 	max: CUIntMax,
@@ -260,7 +260,7 @@ mod tests {
 	fn parse_multi_string() {
 		let string = b"10 200000000000000000000000000000 30 -40\0";
 
-		let mut s = string.as_ptr() as *mut CChar;
+		let mut s = string.as_ptr();
 		let results = [
 			(10, unsafe { s.offset(2) }),
 			(CULong::MAX, unsafe { s.offset(33) }),

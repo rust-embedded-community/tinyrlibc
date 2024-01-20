@@ -8,4 +8,7 @@ fn main() {
 			.file("./src/snprintf.c")
 			.compile("clocal");
 	}
+
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/snprintf.c");
 }
