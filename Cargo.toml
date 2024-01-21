@@ -35,7 +35,6 @@ all = [
     "utoa",
     "itoa",
     "snprintf",
-    "errno",
     "isspace",
     "isdigit",
     "isalpha",
@@ -59,7 +58,6 @@ atoi = []
 utoa = []
 itoa = []
 snprintf = []
-errno = []
 isspace = []
 isdigit = []
 isalpha = []
