@@ -10,6 +10,9 @@
 /// `void`
 pub type CVoid = ::core::ffi::c_void;
 
+/// `size_t`
+pub type CSizeT = usize;
+
 /// `long long int`
 pub type CLongLong = ::core::ffi::c_longlong;
 

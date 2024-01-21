@@ -9,12 +9,27 @@
 
 #![cfg_attr(not(test), no_std)]
 #![allow(clippy::missing_safety_doc)]
+#![allow(unused_imports)]
 
-#[cfg(test)]
-#[allow(unused_imports)]
-use std as core;
+#[cfg(feature = "alloc")]
+mod malloc;
+#[cfg(feature = "alloc")]
+pub use self::malloc::{calloc, free, malloc, realloc};
+
+// A new global allocator is required for the tests, but not for the library itself.
+// This is because the default alloc crate uses the system allocator, collides with
+// the one in this crate, and causes a link error.
+#[cfg(all(feature = "alloc", test))]
+use static_alloc::Bump;
+#[cfg(all(feature = "alloc", test))]
+#[global_allocator]
+static ALLOCATOR: Bump<[u8; 1024 * 1024]> = Bump::uninit();
 
 mod itoa;
+#[cfg(feature = "itoa")]
+pub use self::itoa::itoa;
+#[cfg(feature = "utoa")]
+pub use self::itoa::utoa;
 
 mod abs;
 #[cfg(feature = "abs")]
