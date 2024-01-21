@@ -26,7 +26,11 @@ pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *const CChar, bas
 
 /// Rust implementation of C library function `strtoll`
 #[cfg_attr(feature = "strtoll", no_mangle)]
-pub unsafe extern "C" fn strtoll(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLongLong {
+pub unsafe extern "C" fn strtoll(
+	s: *const CChar,
+	endptr: *mut *const CChar,
+	base: CInt,
+) -> CLongLong {
 	strtox(s, endptr, base, CLongLong::MIN, CLongLong::MAX as _) as CLongLong
 }
 
@@ -42,13 +46,21 @@ pub unsafe extern "C" fn strtoull(
 
 /// Rust implementation of C library function `strtoimax`
 #[cfg_attr(feature = "strtoimax", no_mangle)]
-pub unsafe extern "C" fn strtoimax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CIntMax {
+pub unsafe extern "C" fn strtoimax(
+	s: *const CChar,
+	endptr: *mut *const CChar,
+	base: CInt,
+) -> CIntMax {
 	strtox(s, endptr, base, CIntMax::MIN, CIntMax::MAX as _) as CIntMax
 }
 
 /// Rust implementation of C library function `strtoumax`
 #[cfg_attr(feature = "strtoumax", no_mangle)]
-pub unsafe extern "C" fn strtoumax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CUIntMax {
+pub unsafe extern "C" fn strtoumax(
+	s: *const CChar,
+	endptr: *mut *const CChar,
+	base: CInt,
+) -> CUIntMax {
 	strtox(s, endptr, base, 0, CUIntMax::MAX) as CUIntMax
 }
 
@@ -60,7 +72,7 @@ pub unsafe fn strtox(
 	max: CUIntMax,
 ) -> CUIntMax {
 	if !(0..=36).contains(&base) {
-        // TODO: set errno to EINVAL
+		// TODO: set errno to EINVAL
 		return 0;
 	}
 
@@ -147,7 +159,7 @@ pub unsafe fn strtox(
 
 	// Report overflow.
 	if overflow {
-        // TODO: set errno to ERANGE
+		// TODO: set errno to ERANGE
 		return if negate && min != 0 {
 			min as CUIntMax
 		} else {
@@ -223,10 +235,7 @@ mod tests {
 			unsafe { strtoul(b"0xAA123\0".as_ptr(), null_mut(), 0) },
 			0xAA123
 		);
-		assert_eq!(
-			unsafe { strtoul(b"0X00\0".as_ptr(), null_mut(), 0) },
-			0x00
-		);
+		assert_eq!(unsafe { strtoul(b"0X00\0".as_ptr(), null_mut(), 0) }, 0x00);
 		assert_eq!(
 			unsafe { strtoul(b"-0x123456F\0".as_ptr(), null_mut(), 0) },
 			(-0x123456Fi32) as _

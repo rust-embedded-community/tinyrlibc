@@ -31,14 +31,12 @@ all = [
     "strtoull",
     "strtoimax",
     "strtoumax",
-    "strtoul",
     "strstr",
     "strchr",
     "atoi",
     "utoa",
     "itoa",
     "snprintf",
-    "errno",
     "isspace",
     "isdigit",
     "isalpha",
@@ -63,7 +61,6 @@ atoi = []
 utoa = []
 itoa = []
 snprintf = []
-errno = []
 isspace = []
 isdigit = []
 isalpha = []
