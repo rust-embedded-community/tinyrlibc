@@ -5,13 +5,8 @@
 use crate::CInt;
 
 /// Rust implementation of C library function `abs`
-///
-/// ```
-/// use tinyrlibc::abs;
-/// assert_eq!(abs(-2), 2);
-/// ```
 #[cfg_attr(feature = "abs", no_mangle)]
-pub fn abs(i: CInt) -> CInt {
+pub extern "C" fn abs(i: CInt) -> CInt {
 	i.abs()
 }
 

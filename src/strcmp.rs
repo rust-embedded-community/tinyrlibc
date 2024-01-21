@@ -7,7 +7,7 @@ use crate::{CChar, CInt};
 
 /// Rust implementation of C library function `strcmp`
 #[cfg_attr(feature = "strcmp", no_mangle)]
-pub unsafe fn strcmp(s1: *const CChar, s2: *const CChar) -> CInt {
+pub unsafe extern "C" fn strcmp(s1: *const CChar, s2: *const CChar) -> CInt {
 	for i in 0.. {
 		let s1_i = s1.offset(i);
 		let s2_i = s2.offset(i);

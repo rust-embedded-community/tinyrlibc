@@ -13,25 +13,26 @@ pub unsafe extern "C" fn atoi(s: *const CChar) -> CInt {
 
 /// Rust implementation of C library function `atol`
 #[cfg_attr(feature = "strtol", no_mangle)]
-pub unsafe fn strtol(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLong {
+pub unsafe extern "C" fn strtol(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLong {
 	strtox(s, endptr, base, CLong::MIN as _, CLong::MAX as _) as CLong
 }
 
 /// Rust implementation of C library function `strtoul`
+#[cfg_attr(not(feature = "strtoul"), export_name = "tinyrlibc_strtoul")]
 #[cfg_attr(feature = "strtoul", no_mangle)]
-pub unsafe fn strtoul(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CULong {
+pub unsafe extern "C" fn strtoul(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CULong {
 	strtox(s, endptr, base, 0, CULong::MAX as _) as CULong
 }
 
 /// Rust implementation of C library function `strtoll`
 #[cfg_attr(feature = "strtoll", no_mangle)]
-pub unsafe fn strtoll(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLongLong {
+pub unsafe extern "C" fn strtoll(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CLongLong {
 	strtox(s, endptr, base, CLongLong::MIN, CLongLong::MAX as _) as CLongLong
 }
 
 /// Rust implementation of C library function `strtoull`
 #[cfg_attr(feature = "strtoull", no_mangle)]
-pub unsafe fn strtoull(
+pub unsafe extern "C" fn strtoull(
 	s: *const CChar,
 	endptr: *mut *const CChar,
 	base: CInt,
@@ -41,13 +42,13 @@ pub unsafe fn strtoull(
 
 /// Rust implementation of C library function `strtoimax`
 #[cfg_attr(feature = "strtoimax", no_mangle)]
-pub unsafe fn strtoimax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CIntMax {
+pub unsafe extern "C" fn strtoimax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CIntMax {
 	strtox(s, endptr, base, CIntMax::MIN, CIntMax::MAX as _) as CIntMax
 }
 
 /// Rust implementation of C library function `strtoumax`
 #[cfg_attr(feature = "strtoumax", no_mangle)]
-pub unsafe fn strtoumax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CUIntMax {
+pub unsafe extern "C" fn strtoumax(s: *const CChar, endptr: *mut *const CChar, base: CInt) -> CUIntMax {
 	strtox(s, endptr, base, 0, CUIntMax::MAX) as CUIntMax
 }
 
@@ -165,7 +166,7 @@ pub unsafe fn strtox(
 
 /// Rust implementation of C library function `isspace`
 #[cfg_attr(feature = "isspace", no_mangle)]
-pub fn isspace(argument: CInt) -> CInt {
+pub extern "C" fn isspace(argument: CInt) -> CInt {
 	match argument as CChar {
 		b' ' | b'\t' | b'\n' | b'\r' | 0x0b | 0x0c => 1,
 		_ => 0,
@@ -174,19 +175,19 @@ pub fn isspace(argument: CInt) -> CInt {
 
 /// Rust implementation of C library function `isdigit`
 #[cfg_attr(feature = "isdigit", no_mangle)]
-pub fn isdigit(argument: CInt) -> CInt {
+pub extern "C" fn isdigit(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_digit() as CInt
 }
 
 /// Rust implementation of C library function `isalpha`
 #[cfg_attr(feature = "isalpha", no_mangle)]
-pub fn isalpha(argument: CInt) -> CInt {
+pub extern "C" fn isalpha(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_alphabetic() as CInt
 }
 
 /// Rust implementation of C library function `isupper`
 #[cfg_attr(feature = "isupper", no_mangle)]
-pub fn isupper(argument: CInt) -> CInt {
+pub extern "C" fn isupper(argument: CInt) -> CInt {
 	(argument as CChar).is_ascii_uppercase() as CInt
 }
 
