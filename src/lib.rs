@@ -43,26 +43,26 @@ pub use self::strlen::strlen;
 mod strtol;
 #[cfg(feature = "atoi")]
 pub use self::strtol::atoi;
-#[cfg(feature = "strtol")]
-pub use self::strtol::strtol;
-#[cfg(feature = "strtoul")]
-pub use self::strtol::strtoul;
-#[cfg(feature = "strtoll")]
-pub use self::strtol::strtoll;
-#[cfg(feature = "strtoull")]
-pub use self::strtol::strtoull;
-#[cfg(feature = "strtoimax")]
-pub use self::strtol::strtoimax;
-#[cfg(feature = "strtoumax")]
-pub use self::strtol::strtoumax;
-#[cfg(feature = "isspace")]
-pub use self::strtol::isspace;
 #[cfg(feature = "isalpha")]
 pub use self::strtol::isalpha;
 #[cfg(feature = "isdigit")]
 pub use self::strtol::isdigit;
+#[cfg(feature = "isspace")]
+pub use self::strtol::isspace;
 #[cfg(feature = "isupper")]
 pub use self::strtol::isupper;
+#[cfg(feature = "strtoimax")]
+pub use self::strtol::strtoimax;
+#[cfg(feature = "strtol")]
+pub use self::strtol::strtol;
+#[cfg(feature = "strtoll")]
+pub use self::strtol::strtoll;
+#[cfg(feature = "strtoul")]
+pub use self::strtol::strtoul;
+#[cfg(feature = "strtoull")]
+pub use self::strtol::strtoull;
+#[cfg(feature = "strtoumax")]
+pub use self::strtol::strtoumax;
 
 mod strstr;
 #[cfg(feature = "strstr")]
