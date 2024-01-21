@@ -2,9 +2,9 @@ fn main() {
 	if cfg!(feature = "snprintf") {
 		// Build our snprintf substitute (which has to be C as Rust doesn't do varargs)
 		let mut build = cc::Build::new();
-		
-        build
-            .warnings(true)
+
+		build
+			.warnings(true)
 			.extra_warnings(true)
 			.flag("-std=c99")
 			.file("./src/snprintf.c");
