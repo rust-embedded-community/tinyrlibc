@@ -28,7 +28,6 @@ all = [
     "strtoull",
     "strtoimax",
     "strtoumax",
-    "strtoul",
     "strstr",
     "strchr",
     "atoi",
