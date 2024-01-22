@@ -8,7 +8,6 @@
 
 use crate::CChar;
 
-#[no_mangle]
 /// Formats the given value `i`, with the given radix, into the given buffer (of the given length).
 ///
 /// No prefixes (like 0x or 0b) are generated. Only radix values in the range
@@ -16,6 +15,8 @@ use crate::CChar;
 ///
 /// Returns the number of bytes written on success (not including the null),
 /// or -1 if the buffer wasn't large enough.
+#[cfg_attr(not(feature = "itoa"), export_name = "tinyrlibc_itoa")]
+#[cfg_attr(feature = "itoa", no_mangle)]
 pub unsafe extern "C" fn itoa(i: i64, s: *mut CChar, s_len: usize, radix: u8) -> i32 {
 	let (is_negative, pos_i) = if i < 0 {
 		(true, (-i) as u64)
@@ -31,7 +32,6 @@ pub unsafe extern "C" fn itoa(i: i64, s: *mut CChar, s_len: usize, radix: u8) ->
 	}
 }
 
-#[no_mangle]
 /// Formats the given value `u`, with the given radix, into the given buffer (of the given length).
 ///
 /// No prefixes (like 0x or 0b) are generated. Only radix values in the range
@@ -39,6 +39,8 @@ pub unsafe extern "C" fn itoa(i: i64, s: *mut CChar, s_len: usize, radix: u8) ->
 ///
 /// Returns the number of bytes written on success (not including the null),
 /// or -1 if the buffer wasn't large enough.
+#[cfg_attr(not(feature = "utoa"), export_name = "tinyrlibc_utoa")]
+#[cfg_attr(feature = "utoa", no_mangle)]
 pub unsafe extern "C" fn utoa(mut u: u64, s: *mut CChar, s_len: usize, radix: u8) -> i32 {
 	let buffer_slice = core::slice::from_raw_parts_mut(s, s_len);
 

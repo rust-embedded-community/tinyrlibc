@@ -7,7 +7,7 @@ use crate::CChar;
 
 /// Rust implementation of C library function `strncmp`. Passing NULL
 /// (core::ptr::null()) gives undefined behaviour.
-#[no_mangle]
+#[cfg_attr(feature = "strncpy", no_mangle)]
 pub unsafe extern "C" fn strncpy(
 	dest: *mut CChar,
 	src: *const CChar,

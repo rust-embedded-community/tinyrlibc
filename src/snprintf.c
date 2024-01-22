@@ -65,7 +65,7 @@ extern int32_t utoa(uint64_t i, char* s, size_t s_len, uint8_t radix);
 /**
  * This is provided by `strtoul.rs`. It converts a string to a long.
  */
-extern unsigned long int strtoul(const char* str, const char* restrict* endptr, int base);
+extern unsigned long int strtoul(const char* str, char** endptr, int base);
 
 /* ======================================================================== *
  *
@@ -106,7 +106,7 @@ extern unsigned long int strtoul(const char* str, const char* restrict* endptr, 
  * @return the number of characters written to `str`
  */
 int vsnprintf(
-   char* restrict str, size_t size, const char* restrict fmt, va_list ap )
+   char* restrict str, size_t size, const char* fmt, va_list ap )
 {
    size_t written = 0;
    bool is_escape = false;
@@ -347,7 +347,7 @@ int vsnprintf(
                }
                else
                {
-                  precision = strtoul(fmt, &fmt, 10);
+                  precision = strtoul(fmt, (char**) &fmt, 10);
                   // Strtoul sets the fmt pointer to the char after the number,
                   // however the code expects the char before that.
                   fmt--;

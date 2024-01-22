@@ -24,11 +24,20 @@ all = [
     "strlen",
     "strtol",
     "strtoul",
+    "strtoll",
+    "strtoull",
+    "strtoimax",
+    "strtoumax",
     "strstr",
     "strchr",
     "atoi",
+    "utoa",
     "itoa",
     "snprintf",
+    "isspace",
+    "isdigit",
+    "isalpha",
+    "isupper",
 ]
 abs = []
 strcmp = []
@@ -38,8 +47,17 @@ strncpy = []
 strlen = []
 strtol = []
 strtoul = []
+strtoll = []
+strtoull = []
+strtoimax = []
+strtoumax = []
 strstr = []
 strchr = []
 atoi = []
+utoa = []
 itoa = []
 snprintf = []
+isspace = []
+isdigit = []
+isalpha = []
+isupper = []

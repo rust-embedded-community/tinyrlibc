@@ -5,123 +5,74 @@
 //! This file is Copyright (c) Jonathan 'theJPster' Pallant 2019
 //! Licensed under the Blue Oak Model Licence 1.0.0
 //!
-//! See each module for its respective licence.
+//! See each module for its respective license.
 
 #![cfg_attr(not(test), no_std)]
+#![allow(clippy::missing_safety_doc)]
 
 #[cfg(test)]
 #[allow(unused_imports)]
 use std as core;
 
-#[cfg(feature = "abs")]
+mod itoa;
+
 mod abs;
 #[cfg(feature = "abs")]
 pub use self::abs::abs;
 
-#[cfg(feature = "strcmp")]
 mod strcmp;
 #[cfg(feature = "strcmp")]
 pub use self::strcmp::strcmp;
 
-#[cfg(feature = "strncmp")]
 mod strncmp;
 #[cfg(feature = "strncmp")]
 pub use self::strncmp::strncmp;
 
-#[cfg(feature = "strcpy")]
 mod strcpy;
 #[cfg(feature = "strcpy")]
 pub use self::strcpy::strcpy;
 
-#[cfg(feature = "strncpy")]
 mod strncpy;
 #[cfg(feature = "strncpy")]
 pub use self::strncpy::strncpy;
 
-#[cfg(feature = "strlen")]
 mod strlen;
 #[cfg(feature = "strlen")]
 pub use self::strlen::strlen;
 
-#[cfg(feature = "strtol")]
 mod strtol;
+#[cfg(feature = "atoi")]
+pub use self::strtol::atoi;
+#[cfg(feature = "isalpha")]
+pub use self::strtol::isalpha;
+#[cfg(feature = "isdigit")]
+pub use self::strtol::isdigit;
+#[cfg(feature = "isspace")]
+pub use self::strtol::isspace;
+#[cfg(feature = "isupper")]
+pub use self::strtol::isupper;
+#[cfg(feature = "strtoimax")]
+pub use self::strtol::strtoimax;
 #[cfg(feature = "strtol")]
 pub use self::strtol::strtol;
-
+#[cfg(feature = "strtoll")]
+pub use self::strtol::strtoll;
 #[cfg(feature = "strtoul")]
-mod strtoul;
-#[cfg(feature = "strtoul")]
-pub use self::strtoul::strtoul;
+pub use self::strtol::strtoul;
+#[cfg(feature = "strtoull")]
+pub use self::strtol::strtoull;
+#[cfg(feature = "strtoumax")]
+pub use self::strtol::strtoumax;
 
-#[cfg(feature = "strstr")]
 mod strstr;
 #[cfg(feature = "strstr")]
 pub use self::strstr::strstr;
 
-#[cfg(feature = "strchr")]
 mod strchr;
 #[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
 
-#[cfg(feature = "atoi")]
-mod atoi;
-#[cfg(feature = "atoi")]
-pub use self::atoi::atoi;
-
-#[cfg(feature = "itoa")]
-mod itoa;
-#[cfg(feature = "itoa")]
-pub use self::itoa::itoa;
-
-#[cfg(feature = "snprintf")]
 mod snprintf;
 
-/// `long long int`
-pub type CLongLong = ::core::ffi::c_longlong;
-
-/// `unsigned long long int`
-pub type CULongLong = ::core::ffi::c_ulonglong;
-
-/// `long int`
-pub type CLong = ::core::ffi::c_long;
-
-/// `unsigned long int`
-pub type CULong = ::core::ffi::c_ulong;
-
-/// `int`
-pub type CInt = ::core::ffi::c_int;
-
-/// `unsigned int`
-pub type CUInt = ::core::ffi::c_uint;
-
-/// Represents an 8-bit `char`. Rust does not (and will never) support
-/// platforms where `char` is not 8-bits long.
-pub type CChar = u8;
-
-/// This allows you to iterate a null-terminated string in a relatively simple
-/// way.
-pub struct CStringIter {
-	ptr: *const CChar,
-	idx: isize,
-}
-
-impl CStringIter {
-	/// Create a new iterator from a pointer to a null-terminated string. The
-	/// behaviour is undefined if the string is not null-terminated.
-	pub fn new(s: *const CChar) -> CStringIter {
-		CStringIter { ptr: s, idx: 0 }
-	}
-}
-
-impl core::iter::Iterator for CStringIter {
-	type Item = CChar;
-	fn next(&mut self) -> Option<Self::Item> {
-		let c = unsafe { *self.ptr.offset(self.idx) };
-		if c == 0 {
-			None
-		} else {
-			self.idx += 1;
-			Some(c)
-		}
-	}
-}
+mod ctype;
+pub use self::ctype::*;
