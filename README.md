@@ -30,6 +30,11 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 * strchr
 * snprintf
 * vsnprintf
+* alloc (optional)
+    * malloc
+    * calloc
+    * realloc
+    * free
 
 ## Non-standard helper functions
 
