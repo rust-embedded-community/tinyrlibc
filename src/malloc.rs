@@ -93,36 +93,36 @@ mod test {
 
 	#[test]
 	fn test_malloc() {
-		let ptr = malloc(10);
+		let ptr = unsafe { malloc(10) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
 		}
-		free(ptr);
+		unsafe { free(ptr) };
 	}
 
 	#[test]
 	fn test_calloc() {
-		let ptr = calloc(10, 10);
+		let ptr = unsafe { calloc(10, 10) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 100);
 		}
-		free(ptr);
+		unsafe { free(ptr) };
 	}
 
 	#[test]
 	fn test_realloc() {
-		let ptr = malloc(10);
+		let ptr = unsafe { malloc(10) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
 		}
-		let ptr = realloc(ptr, 20);
+		let ptr = unsafe { realloc(ptr, 20) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 20);
 		}
-		free(ptr);
+		unsafe { free(ptr) };
 	}
 }
