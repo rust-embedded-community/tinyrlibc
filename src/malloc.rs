@@ -32,15 +32,15 @@ pub unsafe extern "C" fn malloc(size: CSizeT) -> *mut u8 {
 #[no_mangle]
 pub unsafe extern "C" fn calloc(nmemb: CSizeT, size: CSizeT) -> *mut u8 {
 	let total_size = nmemb * size;
-    let layout = alloc::alloc::Layout::from_size_align(total_size + MAX_ALIGN, MAX_ALIGN).unwrap();
-    let ptr = unsafe { alloc::alloc::alloc_zeroed(layout) };
-    if ptr.is_null() {
-        return ptr;
-    }
-    unsafe {
-        *(ptr as *mut CSizeT) = total_size;
-    }
-    unsafe { ptr.add(MAX_ALIGN) }
+	let layout = alloc::alloc::Layout::from_size_align(total_size + MAX_ALIGN, MAX_ALIGN).unwrap();
+	let ptr = unsafe { alloc::alloc::alloc_zeroed(layout) };
+	if ptr.is_null() {
+		return ptr;
+	}
+	unsafe {
+		*(ptr as *mut CSizeT) = total_size;
+	}
+	unsafe { ptr.add(MAX_ALIGN) }
 }
 
 /// Rust implementation of C library function `realloc`
@@ -84,8 +84,12 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
-            (0..10).for_each(|i| { *ptr.add(i) = i as u8; });
-            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
+			(0..10).for_each(|i| {
+				*ptr.add(i) = i as u8;
+			});
+			(0..10).for_each(|i| {
+				assert_eq!(*ptr.add(i), i as u8);
+			});
 		}
 		unsafe { free(ptr) };
 	}
@@ -96,9 +100,15 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 100);
-            (0..100).for_each(|i| { assert_eq!(*ptr.add(i), 0); });
-            (0..100).for_each(|i| { *ptr.add(i) = i as u8; });
-            (0..100).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
+			(0..100).for_each(|i| {
+				assert_eq!(*ptr.add(i), 0);
+			});
+			(0..100).for_each(|i| {
+				*ptr.add(i) = i as u8;
+			});
+			(0..100).for_each(|i| {
+				assert_eq!(*ptr.add(i), i as u8);
+			});
 		}
 		unsafe { free(ptr) };
 	}
@@ -109,16 +119,26 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
-            (0..10).for_each(|i| { *ptr.add(i) = i as u8; });
-            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
+			(0..10).for_each(|i| {
+				*ptr.add(i) = i as u8;
+			});
+			(0..10).for_each(|i| {
+				assert_eq!(*ptr.add(i), i as u8);
+			});
 		}
 		let ptr = unsafe { realloc(ptr, 20) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 20);
-            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
-            (10..20).for_each(|i| { *ptr.add(i) = i as u8; });
-            (10..20).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
+			(0..10).for_each(|i| {
+				assert_eq!(*ptr.add(i), i as u8);
+			});
+			(10..20).for_each(|i| {
+				*ptr.add(i) = i as u8;
+			});
+			(10..20).for_each(|i| {
+				assert_eq!(*ptr.add(i), i as u8);
+			});
 		}
 		unsafe { free(ptr) };
 	}
