@@ -11,13 +11,10 @@ const MAX_ALIGN: usize = 16;
 
 /// Rust implementation of C library function `malloc`
 ///
-/// This function allocates memory by calling Rust's global allocator.
-/// The allocated memory is aligned to the maximum alignment of any fundamental type.
-/// Due to the design of the rust global allocator, the size of the allocated memory is stored
-/// in the first 16 bytes of the allocated memory, prior to the returned pointer.
+/// See [malloc](https://linux.die.net/man/3/malloc) for alignment details.
 #[no_mangle]
 pub unsafe extern "C" fn malloc(size: CSizeT) -> *mut u8 {
-	// size + 1 for to store the size of the allocated memory.
+	// size + MAX_ALIGN for to store the size of the allocated memory.
 	let layout = alloc::alloc::Layout::from_size_align(size + MAX_ALIGN, MAX_ALIGN).unwrap();
 	let ptr = unsafe { alloc::alloc::alloc(layout) };
 	if ptr.is_null() {
@@ -31,29 +28,24 @@ pub unsafe extern "C" fn malloc(size: CSizeT) -> *mut u8 {
 
 /// Rust implementation of C library function `calloc`
 ///
-/// This function allocates memory to zero by calling Rust's global allocator.
-/// The allocated memory is aligned to the maximum alignment of any fundamental type.
-/// Due to the design of the rust global allocator, the size of the allocated memory is stored
-/// in the first 16 bytes of the allocated memory, prior to the returned pointer.
+/// See [calloc](https://linux.die.net/man/3/calloc) for alignment details.
 #[no_mangle]
 pub unsafe extern "C" fn calloc(nmemb: CSizeT, size: CSizeT) -> *mut u8 {
 	let total_size = nmemb * size;
-	let ptr = malloc(total_size);
-	if ptr.is_null() {
-		return ptr;
-	}
-	unsafe {
-		core::ptr::write_bytes(ptr, 0, total_size);
-	}
-	ptr
+    let layout = alloc::alloc::Layout::from_size_align(total_size + MAX_ALIGN, MAX_ALIGN).unwrap();
+    let ptr = unsafe { alloc::alloc::alloc_zeroed(layout) };
+    if ptr.is_null() {
+        return ptr;
+    }
+    unsafe {
+        *(ptr as *mut CSizeT) = total_size;
+    }
+    unsafe { ptr.add(MAX_ALIGN) }
 }
 
 /// Rust implementation of C library function `realloc`
 ///
-/// This function reallocates memory by calling Rust's global allocator.
-/// The allocated memory is aligned to the maximum alignment of any fundamental type.
-/// Due to the design of the rust global allocator, the size of the allocated memory is stored
-/// in the first 16 bytes of the allocated memory, prior to the returned pointer.
+/// See [realloc](https://linux.die.net/man/3/realloc) for alignment details.
 #[no_mangle]
 pub unsafe extern "C" fn realloc(ptr: *mut u8, size: CSizeT) -> *mut u8 {
 	if ptr.is_null() {
@@ -72,11 +64,6 @@ pub unsafe extern "C" fn realloc(ptr: *mut u8, size: CSizeT) -> *mut u8 {
 }
 
 /// Rust implementation of C library function `free`
-///
-/// This function frees memory by calling Rust's global allocator.
-/// The allocated memory is aligned to the maximum alignment of any fundamental type.
-/// Due to the design of the rust global allocator, the size of the allocated memory is stored
-/// in the first 16 bytes of the allocated memory, prior to the returned pointer.
 #[no_mangle]
 pub unsafe extern "C" fn free(ptr: *mut u8) {
 	if ptr.is_null() {
@@ -97,6 +84,8 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
+            (0..10).for_each(|i| { *ptr.add(i) = i as u8; });
+            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
 		}
 		unsafe { free(ptr) };
 	}
@@ -107,6 +96,9 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 100);
+            (0..100).for_each(|i| { assert_eq!(*ptr.add(i), 0); });
+            (0..100).for_each(|i| { *ptr.add(i) = i as u8; });
+            (0..100).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
 		}
 		unsafe { free(ptr) };
 	}
@@ -117,11 +109,16 @@ mod test {
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 10);
+            (0..10).for_each(|i| { *ptr.add(i) = i as u8; });
+            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
 		}
 		let ptr = unsafe { realloc(ptr, 20) };
 		assert!(!ptr.is_null());
 		unsafe {
 			assert_eq!(*(ptr.sub(MAX_ALIGN) as *mut CSizeT), 20);
+            (0..10).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
+            (10..20).for_each(|i| { *ptr.add(i) = i as u8; });
+            (10..20).for_each(|i| { assert_eq!(*ptr.add(i), i as u8); });
 		}
 		unsafe { free(ptr) };
 	}
