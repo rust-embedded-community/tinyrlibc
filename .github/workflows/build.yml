@@ -39,7 +39,7 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --target=${{ matrix.TARGET }}
+          args: --target=${{ matrix.TARGET }} --all-features
 
   test:
     name: Tests
