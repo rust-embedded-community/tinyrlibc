@@ -9,9 +9,11 @@ readme = "README.md"
 repository = "https://github.com/thejpster/tinyrlibc"
 
 [dependencies]
+critical-section = "1.1.2"
 
 [dev-dependencies]
 static-alloc = "0.2.4"
+critical-section = { version = "1.1.2", features = ["std"]}
 
 [build-dependencies]
 cc = "1.0"
@@ -43,6 +45,7 @@ all = [
     "isalpha",
     "isupper",
     "alloc",
+    "signal",
 ]
 abs = []
 strcmp = []
@@ -68,3 +71,4 @@ isdigit = []
 isalpha = []
 isupper = []
 alloc = []
+signal = []
