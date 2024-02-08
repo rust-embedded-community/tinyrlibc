@@ -1,17 +1,25 @@
 //! Rust implementation of the C standard library's `signal` related functions.
 //!
+//! Copyright (c) Gyungmin Myung <gmmyung@kaist.ac.kr>
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use core::cell::RefCell;
+use core::{cell::RefCell, default};
 use critical_section::Mutex;
 
-// Signal hanling is emulated by the `critical-section` crate.
-static SIGNAL_HANDLERS: Mutex<RefCell<[extern "C" fn(i32); 16]>> =
-	Mutex::new(RefCell::new([default_handler; 16]));
+// Signal handling is emulated by the `critical-section` crate.
+static SIGNAL_HANDLERS: Mutex<RefCell<[Option<extern "C" fn(i32)>; 16]>> =
+	Mutex::new(RefCell::new([None; 16]));
+
+type SignalHandler = Option<extern "C" fn(i32)>;
 
 const SIG_DFL: usize = 0;
 const SIG_IGN: usize = 1;
 const SIG_ERR: isize = -1;
+
+// This is required because rust doesn't support 0, 1, -1 as a function pointer.
+fn signal_handler(ptr: usize) -> SignalHandler {
+	unsafe { core::mem::transmute(ptr) }
+}
 
 // Only ANSI C signals are now supported.
 // SIGSEGV, SIGILL, SIGFPE are not supported on bare metal, but handlers are invoked when raise() is called.
@@ -25,18 +33,18 @@ const SIGFPE: i32 = 8;
 
 const SIGNALS: [i32; 6] = [SIGTERM, SIGSEGV, SIGINT, SIGILL, SIGABRT, SIGFPE];
 
-extern "C" fn ignore_handler(_sig: i32) {}
+fn ignore_handler(_sig: i32) {}
 
-extern "C" fn default_handler(_sig: i32) {
+fn default_handler(_sig: i32) {
 	// TODO: This should call core::intrinsics::abort() but that's unstable.
 	panic!("Aborted");
 }
 
 /// Rust implementation of the C standard library's `signal` function.
 #[cfg_attr(all(not(test), feature = "signal"), no_mangle)]
-pub unsafe extern "C" fn signal(sig: i32, handler: extern "C" fn(i32)) -> extern "C" fn(i32) {
+pub unsafe extern "C" fn signal(sig: i32, handler: SignalHandler) -> SignalHandler {
 	if SIGNALS.iter().all(|&s| s != sig) {
-		return core::mem::transmute(SIG_ERR);
+		return signal_handler(SIG_ERR as usize);
 	}
 	critical_section::with(|cs| {
 		let mut handlers = SIGNAL_HANDLERS.borrow(cs).borrow_mut();
@@ -55,10 +63,12 @@ pub unsafe extern "C" fn raise(sig: i32) -> i32 {
 	critical_section::with(|cs| {
 		let handlers = SIGNAL_HANDLERS.borrow(cs).borrow();
 		let handler = handlers[sig as usize];
-		match handler as usize {
-			SIG_DFL => default_handler(sig),
-			SIG_IGN => ignore_handler(sig),
-			_ => handler(sig),
+		if handler == signal_handler(SIG_DFL) {
+			default_handler(sig);
+		} else if handler == signal_handler(SIG_IGN) {
+			ignore_handler(sig);
+		} else {
+			handler.unwrap()(sig);
 		}
 		0
 	})
@@ -77,31 +87,24 @@ mod tests {
 
 	#[test]
 	fn test_signal() {
-		unsafe {
-			static COUNT: Mutex<RefCell<i32>> = Mutex::new(RefCell::new(0));
+		critical_section::with(|cs| unsafe {
+			static mut COUNT: usize = 0;
 			extern "C" fn count_handler(_sig: i32) {
-				critical_section::with(|cs| {
-					let mut count = COUNT.borrow(cs).borrow_mut();
-					*count += 1;
-				});
+				unsafe { COUNT += 1 };
 			}
-			println!("default_handler: {}", default_handler as usize);
-			println!("count_handler: {}", count_handler as usize);
-			let old_handler = signal(SIGTERM, count_handler);
-			println!("old_handler: {}", old_handler as usize);
-			println!("count_handler: {}", count_handler as usize);
-			println!("default_handler: {}", default_handler as usize);
-			assert_eq!(old_handler as usize, default_handler as usize);
+			dbg!(SIGNAL_HANDLERS.borrow(cs).borrow());
+			let old_handler = signal(SIGTERM, Some(count_handler));
+			assert_eq!(old_handler, signal_handler(SIG_DFL));
 			(0..10).for_each(|_| {
 				raise(SIGTERM);
 			});
-			let old_handler = signal(SIGTERM, default_handler);
-			critical_section::with(|cs| {
-				let count = COUNT.borrow(cs).borrow();
-				assert_eq!(*count, 10);
-			});
-			assert_eq!(old_handler as usize, count_handler as usize);
-		}
+			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_DFL));
+			assert_eq!(COUNT, 10);
+			assert_eq!(
+				old_handler.unwrap() as usize,
+				Some(count_handler).unwrap() as usize
+			);
+		});
 	}
 
 	#[test]
@@ -113,22 +116,38 @@ mod tests {
 	}
 
 	#[test]
-	fn test_abort_signal() {
-		static TRIGGER: Mutex<RefCell<bool>> = Mutex::new(RefCell::new(false));
-		extern "C" fn trigger_handler(_sig: i32) {
-			critical_section::with(|cs| {
-				let mut trigger = TRIGGER.borrow(cs).borrow_mut();
-				*trigger = true;
-			});
-		}
-		unsafe { signal(SIGABRT, trigger_handler) };
+	fn test_signal_error() {
+		let err = unsafe { signal(1000, signal_handler(SIG_DFL)) };
+		assert_eq!(err, signal_handler(SIG_ERR as usize));
+	}
+
+	#[test]
+	fn test_raise() {
 		let result = std::panic::catch_unwind(|| {
-			abort();
+			unsafe { raise(SIGTERM) };
+		});
+		assert!(result.is_err());
+	}
+
+	#[test]
+	fn test_ignore() {
+		critical_section::with(|_cs| unsafe {
+			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_IGN));
+			assert_eq!(old_handler, signal_handler(SIG_DFL));
+			let result = std::panic::catch_unwind(|| {
+				raise(SIGTERM);
+			});
+			assert!(result.is_ok());
+			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_DFL));
+			assert_eq!(old_handler, signal_handler(SIG_IGN));
+		});
+	}
+
+	#[test]
+	fn test_raise_error() {
+		let result = std::panic::catch_unwind(|| {
+			assert!(unsafe { raise(1000) == -1 });
 		});
 		assert!(result.is_ok());
-		critical_section::with(|cs| {
-			let trigger = TRIGGER.borrow(cs).borrow();
-			assert!(*trigger);
-		});
 	}
 }
