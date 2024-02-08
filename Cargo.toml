@@ -43,8 +43,6 @@ all = [
     "isdigit",
     "isalpha",
     "isupper",
-    "alloc",
-    "signal",
 ]
 abs = []
 strcmp = []
