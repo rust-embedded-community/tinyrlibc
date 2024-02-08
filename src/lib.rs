@@ -78,6 +78,7 @@ mod strchr;
 #[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
 
+#[cfg(feature = "signal")]
 mod signal;
 #[cfg(feature = "signal")]
 pub use self::signal::{abort, raise, signal};
