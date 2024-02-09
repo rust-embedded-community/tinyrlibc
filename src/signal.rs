@@ -120,13 +120,38 @@ pub extern "C" fn abort() {
 mod tests {
 	use super::*;
 
+	struct State {
+		inner: std::sync::Mutex<()>,
+	}
+
+	impl State {
+		fn lock(&self) -> std::sync::MutexGuard<()> {
+			// Ensure we have exclusive access
+			let guard = self.inner.lock().unwrap();
+			// Reset the global signal handler list to defaults
+			for sig in SIGNAL_HANDLERS.iter() {
+				sig.store(SIG_DFL, Ordering::SeqCst);
+			}
+			guard
+		}
+	}
+
+	/// Used to ensure we don't run multiple signal test concurrently, because
+	/// they share some global state.
+	///
+	/// If a test fails, the lock will be poisoned and all subsequent tests will
+	/// fail.
+	static TEST_LOCK: State = State {
+		inner: std::sync::Mutex::new(()),
+	};
+
 	#[test]
 	fn test_signal() {
+		let _guard = TEST_LOCK.lock();
 		static COUNT: AtomicUsize = AtomicUsize::new(0);
 		extern "C" fn count_handler(_sig: i32) {
 			COUNT.fetch_add(1, Ordering::Relaxed);
 		}
-		dbg!(&SIGNAL_HANDLERS);
 		let count_handler_ptr = count_handler as *const fn(i32) as usize;
 		let old_handler = unsafe { signal(SIGTERM, count_handler_ptr) };
 		assert_eq!(old_handler, SIG_DFL);
@@ -140,6 +165,7 @@ mod tests {
 
 	#[test]
 	fn test_abort() {
+		let _guard = TEST_LOCK.lock();
 		let result = std::panic::catch_unwind(|| {
 			abort();
 		});
@@ -148,6 +174,7 @@ mod tests {
 
 	#[test]
 	fn test_signal_error() {
+		let _guard = TEST_LOCK.lock();
 		let err = unsafe { signal(1000, SIG_DFL) };
 		assert_eq!(err, SIG_ERR);
 	}
@@ -160,21 +187,17 @@ mod tests {
 
 	#[test]
 	fn test_ignore() {
-		let old_handler = unsafe { signal(SIGTERM, core::mem::transmute(SIG_IGN)) };
+		let _guard = TEST_LOCK.lock();
+		let old_handler = unsafe { signal(SIGTERM, SIG_IGN) };
 		assert_eq!(old_handler, SIG_DFL);
-		let result = std::panic::catch_unwind(|| {
-			raise(SIGTERM);
-		});
-		assert!(result.is_ok());
+		// Shouldn't cause a panic
+		raise(SIGTERM);
 		let old_handler = unsafe { signal(SIGTERM, SIG_DFL) };
 		assert_eq!(old_handler, SIG_IGN);
 	}
 
 	#[test]
 	fn test_raise_error() {
-		let result = std::panic::catch_unwind(|| {
-			assert!(raise(1000) == -1);
-		});
-		assert!(result.is_ok());
+		assert!(raise(1000) == -1);
 	}
 }
