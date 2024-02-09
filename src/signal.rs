@@ -4,81 +4,116 @@
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
 use core::{cell::RefCell, default};
-use critical_section::Mutex;
+use portable_atomic::{AtomicUsize, Ordering};
 
-// Signal handling is emulated by the `critical-section` crate.
-static SIGNAL_HANDLERS: Mutex<RefCell<[Option<extern "C" fn(i32)>; 16]>> =
-	Mutex::new(RefCell::new([None; 16]));
+/// An initialiser for our array.
+///
+/// We turn off the clippy warning because it's wrong - and there's no other
+/// way to initialise an array of atomics.
+#[allow(clippy::declare_interior_mutable_const)]
+const SIG_DFL_ATOMIC: AtomicUsize = AtomicUsize::new(SIG_DFL);
 
-type SignalHandler = Option<extern "C" fn(i32)>;
+/// Our array of registered signal handlers.
+///
+/// Signals in C are either 0, 1, -1, or a function pointer. We cast function
+/// pointers into `usize` so they can be stored in this array.
+static SIGNAL_HANDLERS: [AtomicUsize; 16] = [SIG_DFL_ATOMIC; 16];
 
+/// A signal handler - either a function pointer or a magic integer.
+pub type SignalHandler = usize;
+
+/// Indicates we should use the default signal handler
 const SIG_DFL: usize = 0;
+
+/// Indicates we should use the default signal handler
 const SIG_IGN: usize = 1;
-const SIG_ERR: isize = -1;
 
-// This is required because rust doesn't support 0, 1, -1 as a function pointer.
-fn signal_handler(ptr: usize) -> SignalHandler {
-	unsafe { core::mem::transmute(ptr) }
-}
+/// Indicates we should use the default signal handler
+const SIG_ERR: usize = usize::MAX;
 
-// Only ANSI C signals are now supported.
-// SIGSEGV, SIGILL, SIGFPE are not supported on bare metal, but handlers are invoked when raise() is called.
-// TODO: Support SIGSEGV, SIGILL, SIGFPE by using the `cortex-m-rt` or `riscv-rt` crate.
+/// The TERM signal
 const SIGTERM: i32 = 15;
+
+/// The SEGV signal
 const SIGSEGV: i32 = 11;
+
+/// The INT signal
 const SIGINT: i32 = 2;
+
+/// The ILL signal
 const SIGILL: i32 = 4;
+
+/// The ABRT signal
 const SIGABRT: i32 = 6;
+
+/// The FPE signal
 const SIGFPE: i32 = 8;
 
+/// The list of support signals.
+///
+/// Only ANSI C signals are now supported.
+///
+/// SIGSEGV, SIGILL, SIGFPE are not supported on bare metal, but handlers are
+/// invoked when raise() is called.
+///
+/// We will index `SIGNAL_HANDLERS` by any integer in this list, so ensure that
+/// the array is made larger if required.
+///
+/// TODO: Support SIGSEGV, SIGILL, SIGFPE by using the `cortex-m-rt` or
+/// `riscv-rt` crate.
 const SIGNALS: [i32; 6] = [SIGTERM, SIGSEGV, SIGINT, SIGILL, SIGABRT, SIGFPE];
 
+/// An empty handler function that does nothing
 fn ignore_handler(_sig: i32) {}
 
+/// The default handler functions
+///
+/// Performs a panic.
 fn default_handler(_sig: i32) {
 	// TODO: This should call core::intrinsics::abort() but that's unstable.
 	panic!("Aborted");
 }
 
 /// Rust implementation of the C standard library's `signal` function.
+///
+/// Using `not(test)` ensures we don't replace the actual OS `signal` function
+/// when running tests!
 #[cfg_attr(all(not(test), feature = "signal"), no_mangle)]
 pub unsafe extern "C" fn signal(sig: i32, handler: SignalHandler) -> SignalHandler {
-	if SIGNALS.iter().all(|&s| s != sig) {
-		return signal_handler(SIG_ERR as usize);
+	if !SIGNALS.contains(&sig) {
+		return SIG_ERR;
 	}
-	critical_section::with(|cs| {
-		let mut handlers = SIGNAL_HANDLERS.borrow(cs).borrow_mut();
-		let old_handler = handlers[sig as usize];
-		handlers[sig as usize] = handler;
-		old_handler
-	})
+	SIGNAL_HANDLERS[sig as usize].swap(handler, Ordering::Relaxed)
 }
 
 /// Rust implementation of the C standard library's `raise` function.
+///
+/// Using `not(test)` ensures we don't replace the actual OS `raise` function
+/// when running tests!
 #[cfg_attr(all(not(test), feature = "signal"), no_mangle)]
-pub unsafe extern "C" fn raise(sig: i32) -> i32 {
-	if SIGNALS.iter().all(|&s| s != sig) {
+pub extern "C" fn raise(sig: i32) -> i32 {
+	if !SIGNALS.contains(&sig) {
 		return -1;
 	}
-	critical_section::with(|cs| {
-		let handlers = SIGNAL_HANDLERS.borrow(cs).borrow();
-		let handler = handlers[sig as usize];
-		if handler == signal_handler(SIG_DFL) {
+	let handler = SIGNAL_HANDLERS[sig as usize].load(Ordering::Relaxed);
+	match handler {
+		SIG_DFL => {
 			default_handler(sig);
-		} else if handler == signal_handler(SIG_IGN) {
-			ignore_handler(sig);
-		} else {
-			handler.unwrap()(sig);
 		}
-		0
-	})
+		SIG_IGN => {
+			ignore_handler(sig);
+		}
+		_ => unsafe {
+			let handler_fn: unsafe extern "C" fn(core::ffi::c_int) = core::mem::transmute(handler);
+			handler_fn(sig);
+		},
+	}
+	0
 }
 
 #[cfg_attr(all(not(test), feature = "signal"), no_mangle)]
 pub extern "C" fn abort() {
-	unsafe {
-		raise(SIGABRT);
-	}
+	raise(SIGABRT);
 }
 
 #[cfg(test)]
@@ -87,24 +122,20 @@ mod tests {
 
 	#[test]
 	fn test_signal() {
-		critical_section::with(|cs| unsafe {
-			static mut COUNT: usize = 0;
-			extern "C" fn count_handler(_sig: i32) {
-				unsafe { COUNT += 1 };
-			}
-			dbg!(SIGNAL_HANDLERS.borrow(cs).borrow());
-			let old_handler = signal(SIGTERM, Some(count_handler));
-			assert_eq!(old_handler, signal_handler(SIG_DFL));
-			(0..10).for_each(|_| {
-				raise(SIGTERM);
-			});
-			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_DFL));
-			assert_eq!(COUNT, 10);
-			assert_eq!(
-				old_handler.unwrap() as usize,
-				Some(count_handler).unwrap() as usize
-			);
+		static COUNT: AtomicUsize = AtomicUsize::new(0);
+		extern "C" fn count_handler(_sig: i32) {
+			COUNT.fetch_add(1, Ordering::Relaxed);
+		}
+		dbg!(&SIGNAL_HANDLERS);
+		let count_handler_ptr = count_handler as *const fn(i32) as usize;
+		let old_handler = unsafe { signal(SIGTERM, count_handler_ptr) };
+		assert_eq!(old_handler, SIG_DFL);
+		(0..10).for_each(|_| {
+			raise(SIGTERM);
 		});
+		let old_handler = unsafe { signal(SIGTERM, SIG_DFL) };
+		assert_eq!(COUNT.load(Ordering::Relaxed), 10);
+		assert_eq!(old_handler, count_handler_ptr);
 	}
 
 	#[test]
@@ -117,36 +148,32 @@ mod tests {
 
 	#[test]
 	fn test_signal_error() {
-		let err = unsafe { signal(1000, signal_handler(SIG_DFL)) };
-		assert_eq!(err, signal_handler(SIG_ERR as usize));
+		let err = unsafe { signal(1000, SIG_DFL) };
+		assert_eq!(err, SIG_ERR);
 	}
 
 	#[test]
 	fn test_raise() {
-		let result = std::panic::catch_unwind(|| {
-			unsafe { raise(SIGTERM) };
-		});
+		let result = std::panic::catch_unwind(|| raise(SIGTERM));
 		assert!(result.is_err());
 	}
 
 	#[test]
 	fn test_ignore() {
-		critical_section::with(|_cs| unsafe {
-			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_IGN));
-			assert_eq!(old_handler, signal_handler(SIG_DFL));
-			let result = std::panic::catch_unwind(|| {
-				raise(SIGTERM);
-			});
-			assert!(result.is_ok());
-			let old_handler = signal(SIGTERM, core::mem::transmute(SIG_DFL));
-			assert_eq!(old_handler, signal_handler(SIG_IGN));
+		let old_handler = unsafe { signal(SIGTERM, core::mem::transmute(SIG_IGN)) };
+		assert_eq!(old_handler, SIG_DFL);
+		let result = std::panic::catch_unwind(|| {
+			raise(SIGTERM);
 		});
+		assert!(result.is_ok());
+		let old_handler = unsafe { signal(SIGTERM, SIG_DFL) };
+		assert_eq!(old_handler, SIG_IGN);
 	}
 
 	#[test]
 	fn test_raise_error() {
 		let result = std::panic::catch_unwind(|| {
-			assert!(unsafe { raise(1000) == -1 });
+			assert!(raise(1000) == -1);
 		});
 		assert!(result.is_ok());
 	}
