@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* None
+* [#23] - Add `strncasecmp` 
 
 ## v0.3.0 (2022-10-18)
 
