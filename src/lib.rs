@@ -43,6 +43,10 @@ mod strncmp;
 #[cfg(feature = "strncmp")]
 pub use self::strncmp::strncmp;
 
+mod strncasecmp;
+#[cfg(feature = "strncasecmp")]
+pub use self::strncasecmp::strncasecmp;
+
 mod strcpy;
 #[cfg(feature = "strcpy")]
 pub use self::strcpy::strcpy;
