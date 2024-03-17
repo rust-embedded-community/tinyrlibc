@@ -36,6 +36,10 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
     * calloc
     * realloc
     * free
+* signal (optional)
+    * signal
+    * raise
+    * abort
 
 ## Non-standard helper functions
 
