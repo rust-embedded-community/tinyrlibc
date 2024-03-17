@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-* [#23] - Add `strncasecmp` 
+* [#23] - Add `strncasecmp`
+* [#21] - Add signal API
+
+[#23]: https://github.com/rust-embedded-community/tinyrlibc/pull/21
+[#21]: https://github.com/rust-embedded-community/tinyrlibc/pull/21
 
 ## v0.3.0 (2022-10-18)
 
