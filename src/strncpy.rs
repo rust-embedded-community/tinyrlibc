@@ -13,17 +13,17 @@ pub unsafe extern "C" fn strncpy(
 	src: *const CChar,
 	count: usize,
 ) -> *const CChar {
-	let mut i = 0isize;
-	while i < count as isize {
-		*dest.offset(i) = *src.offset(i);
-		let c = *dest.offset(i);
+	let mut i = 0;
+	while i < count {
+		let c = *src.add(i);
+		*dest.add(i) = c;
 		i += 1;
 		if c == 0 {
 			break;
 		}
 	}
-	for j in i..count as isize {
-		*dest.offset(j) = 0;
+	for j in i..count {
+		*dest.add(j) = 0;
 	}
 	dest
 }
@@ -35,19 +35,22 @@ mod test {
 	#[test]
 	fn short() {
 		let src = b"hi\0";
-		let mut dest = *b"abcdef"; // no null terminator
+		// no null terminator
+		let mut dest = *b"abcdef";
+		// pass in less than full length of dest, to see which bytes get zeroed
 		let result = unsafe { strncpy(dest.as_mut_ptr(), src.as_ptr(), 5) };
+		// two bytes of data, 3 bytes of zeros (= 5 bytes total), plus one byte unchanged
 		assert_eq!(
-			unsafe { core::slice::from_raw_parts(result, 5) },
-			*b"hi\0\0\0"
+			unsafe { core::slice::from_raw_parts(result, 6) },
+			*b"hi\0\0\0f"
 		);
 	}
 
 	#[test]
 	fn two() {
-		let src = b"hi\0";
-		let mut dest = [0u8; 2]; // no space for null terminator
-		let result = unsafe { strncpy(dest.as_mut_ptr(), src.as_ptr(), 2) };
-		assert_eq!(unsafe { core::slice::from_raw_parts(result, 2) }, b"hi");
+		let src = b"hello\0";
+		let mut dest = [0u8; 2]; // buffer deliberately too small
+		let result = unsafe { strncpy(dest.as_mut_ptr(), src.as_ptr(), dest.len()) };
+		assert_eq!(unsafe { core::slice::from_raw_parts(result, 2) }, b"he");
 	}
 }

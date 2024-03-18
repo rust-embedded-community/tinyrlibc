@@ -30,16 +30,8 @@ mod test {
 		let mut dest = *b"abcdef"; // no null terminator
 		let result = unsafe { strcpy(dest.as_mut_ptr(), src.as_ptr()) };
 		assert_eq!(
-			unsafe { core::slice::from_raw_parts(result, 5) },
-			*b"hi\0de"
+			unsafe { core::slice::from_raw_parts(result, 6) },
+			*b"hi\0def"
 		);
-	}
-
-	#[test]
-	fn two() {
-		let src = b"hi\0";
-		let mut dest = [0u8; 2]; // no space for null terminator
-		let result = unsafe { strcpy(dest.as_mut_ptr(), src.as_ptr()) };
-		assert_eq!(unsafe { core::slice::from_raw_parts(result, 2) }, b"hi");
 	}
 }
