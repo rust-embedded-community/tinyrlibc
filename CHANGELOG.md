@@ -2,11 +2,19 @@
 
 ## Unreleased
 
+* None
+
+## v0.4.0 (2024-03-22)
+
 * [#23] - Add `strncasecmp`
 * [#21] - Add signal API
+* [#19] - Add malloc/free API
+* [#14] - C function exports now gated by feature flags
 
-[#23]: https://github.com/rust-embedded-community/tinyrlibc/pull/21
+[#23]: https://github.com/rust-embedded-community/tinyrlibc/pull/23
 [#21]: https://github.com/rust-embedded-community/tinyrlibc/pull/21
+[#19]: https://github.com/rust-embedded-community/tinyrlibc/pull/19
+[#14]: https://github.com/rust-embedded-community/tinyrlibc/pull/14
 
 ## v0.3.0 (2022-10-18)
 
