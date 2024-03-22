@@ -1,12 +1,12 @@
 [package]
 name = "tinyrlibc"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"]
 edition = "2021"
 description = "Tiny, incomplete C library for bare-metal targets, written in Stable (but Unsafe) Rust"
 license-file = "LICENCES.md"
 readme = "README.md"
-repository = "https://github.com/thejpster/tinyrlibc"
+repository = "https://github.com/rust-embedded-community/tinyrlibc"
 
 [dependencies]
 portable-atomic = { version = "1.6.0", optional = true }
