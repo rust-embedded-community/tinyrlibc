@@ -87,6 +87,11 @@ mod signal;
 #[cfg(feature = "signal")]
 pub use self::signal::{abort, raise, signal};
 
+#[cfg(feature = "memchr")]
+mod memchr;
+#[cfg(feature = "memchr")]
+pub use self::memchr::memchr;
+
 mod snprintf;
 
 mod ctype;
