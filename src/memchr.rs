@@ -9,8 +9,8 @@ use crate::{CChar, CInt, CSizeT, CVoid};
 pub unsafe extern "C" fn memchr(s: *const CVoid, c: CInt, n: CSizeT) -> *const CVoid {
 	let s = s as *const CChar;
 	for i in 0..n {
-		if *s.offset(i as isize) as CInt == c {
-			return s.offset(i as isize) as *const CVoid;
+		if *s.add(i) as CInt == c {
+			return s.add(i) as *const CVoid;
 		}
 	}
 	core::ptr::null()
