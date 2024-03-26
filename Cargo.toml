@@ -43,6 +43,7 @@ all = [
     "isdigit",
     "isalpha",
     "isupper",
+    "memchr",
 ]
 abs = []
 strcmp = []
@@ -68,5 +69,6 @@ isdigit = []
 isalpha = []
 isupper = []
 alloc = []
+memchr = []
 signal = ["dep:portable-atomic"]
 signal-cs = ["portable-atomic/critical-section"]

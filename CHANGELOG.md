@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* None
+* [#26] - Add `memchr` 
 
 ## v0.4.0 (2024-03-22)
 
