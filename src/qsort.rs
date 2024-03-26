@@ -246,6 +246,9 @@ fn median_of_three(
 fn swap(mut ptr1: *mut CChar, mut ptr2: *mut CChar, mut width: CSizeT) {
 	use core::mem;
 
+	if ptr1 == ptr2 {
+		return;
+	}
 	const BUFSIZE: usize = 128;
 
 	let mut buffer = mem::MaybeUninit::<[CChar; BUFSIZE]>::uninit();
