@@ -82,6 +82,10 @@ mod strchr;
 #[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
 
+mod qsort;
+#[cfg(feature = "qsort")]
+pub use self::qsort::qsort;
+
 #[cfg(feature = "signal")]
 mod signal;
 #[cfg(feature = "signal")]
