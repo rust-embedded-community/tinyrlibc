@@ -3,6 +3,8 @@
 //! This code snippet is copied from relibc.
 //! MIT license COPYRIGHT (c) 2018 Redox OS
 
+use core::num::NonZeroUsize;
+
 use crate::{CChar, CInt, CSizeT, CVoid};
 
 /// Rust implementation of C library function `qsort`
@@ -26,22 +28,8 @@ fn introsort(
 	width: CSizeT,
 	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
 ) {
-	let maxdepth = 2 * log2(nel);
-	introsort_helper(base, nel, width, maxdepth, comp);
-}
-
-// NOTE: if num is 0, the result should be considered undefined
-fn log2(num: CSizeT) -> CSizeT {
-	const IS_32_BIT: bool = CSizeT::max_value() as u32 as CSizeT == CSizeT::max_value();
-
-	let max_bits = if IS_32_BIT {
-		31
-	} else {
-		// assuming we are 64-bit (this may or may not need to be updated in the future)
-		63
-	};
-
-	max_bits - num.to_le().leading_zeros() as CSizeT
+	let maxdepth = 2 * nel.ilog2();
+	introsort_helper(base, nel, width, maxdepth as CSizeT, comp);
 }
 
 fn introsort_helper(
@@ -51,7 +39,7 @@ fn introsort_helper(
 	mut maxdepth: CSizeT,
 	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
 ) {
-	const THRESHOLD: CSizeT = 8;
+	const THRESHOLD: CSizeT = 16;
 
 	// this loop is a trick to save stack space because TCO is not a thing in Rustland
 	// basically, we just change the arguments and loop rather than recursing for the second call
@@ -278,7 +266,8 @@ mod tests {
 
 	#[test]
 	fn identity() {
-		let mut array = [1, 2, 3, 4, 5, 6, 7, 8];
+		let mut array: Vec<_> = (0..1000).collect();
+		let orig = array.clone();
 
 		unsafe {
 			qsort(
@@ -289,12 +278,29 @@ mod tests {
 			);
 		}
 
-		assert_eq!(array, [1, 2, 3, 4, 5, 6, 7, 8]);
+		assert_eq!(array, orig);
+	}
+
+	#[test]
+	fn identity_heapsort() {
+		let mut array: Vec<_> = (0..1000).collect();
+		let orig = array.clone();
+
+		heapsort(
+			array.as_mut_ptr() as *mut CChar,
+			array.len() as CSizeT,
+			std::mem::size_of::<i32>() as CSizeT,
+			comp,
+		);
+
+		assert_eq!(array, orig);
 	}
 
 	#[test]
 	fn reverse() {
-		let mut array = [8, 7, 6, 5, 4, 3, 2, 1];
+		let mut array: Vec<_> = (0..1000).collect();
+		array.reverse();
+		let orig: Vec<_> = (0..1000).collect();
 
 		unsafe {
 			qsort(
@@ -305,22 +311,22 @@ mod tests {
 			)
 		}
 
-		assert_eq!(array, [1, 2, 3, 4, 5, 6, 7, 8]);
+		assert_eq!(array, orig);
 	}
 
 	#[test]
-	fn random() {
-		let mut array = [3, 1, 4, 7, 2, 6, 5, 8];
+	fn reverse_heapsort() {
+		let mut array: Vec<_> = (0..1000).collect();
+		array.reverse();
+		let orig: Vec<_> = (0..1000).collect();
 
-		unsafe {
-			qsort(
-				array.as_mut_ptr() as *mut CVoid,
-				array.len() as CSizeT,
-				std::mem::size_of::<i32>() as CSizeT,
-				Some(comp),
-			)
-		}
+		heapsort(
+			array.as_mut_ptr() as *mut CChar,
+			array.len() as CSizeT,
+			std::mem::size_of::<i32>() as CSizeT,
+			comp,
+		);
 
-		assert_eq!(array, [1, 2, 3, 4, 5, 6, 7, 8]);
+		assert_eq!(array, orig);
 	}
 }
