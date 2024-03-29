@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* None
+* [#27] - Add `qsort`
 
 ## v0.4.0 (2024-03-22)
 
