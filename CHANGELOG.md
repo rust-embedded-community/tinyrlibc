@@ -3,6 +3,10 @@
 ## Unreleased
 
 * [#26] - Add `memchr` 
+* [#27] - Add `qsort`
+
+[#26]: https://github.com/rust-embedded-community/tinyrlibc/pull/26
+[#27]: https://github.com/rust-embedded-community/tinyrlibc/pull/27
 
 ## v0.4.0 (2024-03-22)
 
