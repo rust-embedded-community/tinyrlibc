@@ -43,6 +43,7 @@ all = [
     "isdigit",
     "isalpha",
     "isupper",
+    "memchr",
     "qsort",
 ]
 abs = []
@@ -69,6 +70,7 @@ isdigit = []
 isalpha = []
 isupper = []
 alloc = []
+memchr = []
 qsort = []
 signal = ["dep:portable-atomic"]
 signal-cs = ["portable-atomic/critical-section"]
