@@ -50,6 +50,11 @@ mod strlen;
 #[cfg(feature = "strlen")]
 pub use self::strlen::strlen;
 
+mod strcat;
+#[cfg(feature = "strlen")]
+#[cfg(feature = "strcpy")]
+pub use self::strcat::strcat;
+
 mod strtol;
 #[cfg(feature = "atoi")]
 pub use self::strtol::atoi;
