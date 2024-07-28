@@ -19,6 +19,7 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 * strcmp
 * strncmp
 * strncasecmp
+* strcat
 * strcpy
 * strncpy
 * strlen
@@ -30,6 +31,7 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 * strtoumax
 * strstr
 * strchr
+* strrchr
 * snprintf
 * vsnprintf
 * qsort
