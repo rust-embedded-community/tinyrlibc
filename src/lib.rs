@@ -51,8 +51,7 @@ mod strlen;
 pub use self::strlen::strlen;
 
 mod strcat;
-#[cfg(feature = "strlen")]
-#[cfg(feature = "strcpy")]
+#[cfg(feature = "strcat")]
 pub use self::strcat::strcat;
 
 mod strtol;
@@ -86,6 +85,10 @@ pub use self::strstr::strstr;
 mod strchr;
 #[cfg(feature = "strchr")]
 pub use self::strchr::strchr;
+
+mod strrchr;
+#[cfg(feature = "strrchr")]
+pub use self::strrchr::strrchr;
 
 mod qsort;
 #[cfg(feature = "qsort")]

@@ -2,13 +2,13 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::{strcpy, strlen, CChar};
+use crate::CChar;
 
 /// Rust implementation of C library function `strcat`. Passing NULL
 /// (core::ptr::null()) gives undefined behaviour.
-#[no_mangle]
+#[cfg_attr(feature = "strcat", no_mangle)]
 pub unsafe extern "C" fn strcat(dest: *mut CChar, src: *const CChar) -> *const CChar {
-	strcpy(dest.add(strlen(dest)), src);
+	crate::strcpy::strcpy(dest.add(crate::strlen::strlen(dest)), src);
 	dest
 }
 
