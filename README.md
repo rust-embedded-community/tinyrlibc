@@ -8,54 +8,53 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 
 ## Implemented so far
 
-* abs
-* strol
-* atoi
-* isspace
-* isdigit
-* isalpha
-* isupper
-* memchr
-* strcmp
-* strncmp
-* strncasecmp
-* strcat
-* strcpy
-* strncpy
-* strlen
-* strtol
-* strtoll
-* strtoul
-* strtoull
-* strtoimax
-* strtoumax
-* strstr
-* strchr
-* strrchr
-* snprintf
-* vsnprintf
-* qsort
-* alloc (optional)
-    * malloc
-    * calloc
-    * realloc
-    * free
-* signal (optional)
-    * signal
-    * raise
-    * abort
+- abs
+- strol
+- atoi
+- isspace
+- isdigit
+- isalpha
+- isupper
+- memchr
+- strcmp
+- strncmp
+- strncasecmp
+- strcat
+- strcpy
+- strncpy
+- strlen
+- strtol
+- strtoll
+- strtoul
+- strtoull
+- strtoimax
+- strtoumax
+- strstr
+- strchr
+- strrchr
+- snprintf
+- vsnprintf
+- qsort
+- alloc (optional)
+  - malloc
+  - calloc
+  - realloc
+  - free
+- signal (optional)
+  - signal
+  - raise
+  - abort
 
 ## Non-standard helper functions
 
-* itoa
-* utoa
+- itoa
+- utoa
 
 ## To Do
 
-* Anything else nrfxlib needs
-* Anything anyone is prepared to submit
+- Anything else nrfxlib needs
+- Anything anyone is prepared to submit
 
 ## Licence
 
 As this is going to be a bunch of bits taken from all over the place (some newlib, some relibc, etc), each function has its own file and each file has its own licence. Any new licences should be appended to the [LICENCE.md](./LICENCE.md) file.
-
