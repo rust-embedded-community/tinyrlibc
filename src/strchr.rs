@@ -25,37 +25,37 @@ mod test {
 	use super::*;
 
 	#[test]
-	fn no_match() {
-		let haystack = b"haystack\0".as_ptr();
+	fn strchr_no_match() {
+		let haystack = b"hayyystack\0".as_ptr();
 		let result = unsafe { strchr(haystack, b'X' as CInt) };
 		assert_eq!(result, core::ptr::null());
 	}
 
 	#[test]
-	fn null() {
-		let haystack = b"haystack\0".as_ptr();
+	fn strchr_null() {
+		let haystack = b"hayyystack\0".as_ptr();
 		let result = unsafe { strchr(haystack, 0) };
-		assert_eq!(result, unsafe { haystack.offset(8) });
+		assert_eq!(result, unsafe { haystack.offset(10) });
 	}
 
 	#[test]
-	fn start() {
-		let haystack = b"haystack\0".as_ptr();
+	fn strchr_start() {
+		let haystack = b"hayyystack\0".as_ptr();
 		let result = unsafe { strchr(haystack, b'h' as CInt) };
 		assert_eq!(result, haystack);
 	}
 
 	#[test]
-	fn middle() {
-		let haystack = b"haystack\0".as_ptr();
+	fn strchr_middle() {
+		let haystack = b"hayyystack\0".as_ptr();
 		let result = unsafe { strchr(haystack, b'y' as CInt) };
 		assert_eq!(result, unsafe { haystack.offset(2) });
 	}
 
 	#[test]
-	fn end() {
-		let haystack = b"haystack\0".as_ptr();
+	fn strchr_end() {
+		let haystack = b"hayyystack\0".as_ptr();
 		let result = unsafe { strchr(haystack, b'k' as CInt) };
-		assert_eq!(result, unsafe { haystack.offset(7) });
+		assert_eq!(result, unsafe { haystack.offset(9) });
 	}
 }

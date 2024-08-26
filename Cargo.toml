@@ -25,6 +25,7 @@ all = [
     "strncmp",
     "strncasecmp",
     "strcpy",
+    "strcat",
     "strncpy",
     "strlen",
     "strtol",
@@ -35,6 +36,7 @@ all = [
     "strtoumax",
     "strstr",
     "strchr",
+    "strrchr",
     "atoi",
     "utoa",
     "itoa",
@@ -51,6 +53,7 @@ strcmp = []
 strncmp = []
 strncasecmp = []
 strcpy = []
+strcat = []
 strncpy = []
 strlen = []
 strtol = []
@@ -61,6 +64,7 @@ strtoimax = []
 strtoumax = []
 strstr = []
 strchr = []
+strrchr = []
 atoi = []
 utoa = []
 itoa = []
