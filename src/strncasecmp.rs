@@ -4,8 +4,9 @@
 
 use crate::{CChar, CInt};
 
-/// Rust implementation of C library function `strncasecmp`. Passing NULL
-/// (core::ptr::null()) gives undefined behaviour.
+/// Rust implementation of C library function `strncasecmp`.
+///
+/// Passing NULL (core::ptr::null()) gives undefined behaviour.
 #[cfg_attr(feature = "strncasecmp", no_mangle)]
 pub unsafe extern "C" fn strncasecmp(s1: *const CChar, s2: *const CChar, n: usize) -> CInt {
 	for i in 0..n {

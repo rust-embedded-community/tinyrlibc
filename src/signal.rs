@@ -15,8 +15,9 @@ const SIG_DFL_ATOMIC: AtomicUsize = AtomicUsize::new(SIG_DFL);
 
 /// Our array of registered signal handlers.
 ///
-/// Signals in C are either 0, 1, -1, or a function pointer. We cast function
-/// pointers into `usize` so they can be stored in this array.
+/// Signals in C are either 0, 1, -1, or a function pointer.
+///
+/// We cast function pointers into `usize` so they can be stored in this array.
 static SIGNAL_HANDLERS: [AtomicUsize; 16] = [SIG_DFL_ATOMIC; 16];
 
 /// A signal handler - either a function pointer or a magic integer.

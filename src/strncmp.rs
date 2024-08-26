@@ -5,8 +5,9 @@
 
 use crate::{CChar, CInt};
 
-/// Rust implementation of C library function `strncmp`. Passing NULL
-/// (core::ptr::null()) gives undefined behaviour.
+/// Rust implementation of C library function `strncmp`.
+///
+/// Passing NULL (core::ptr::null()) gives undefined behaviour.
 #[cfg_attr(feature = "strncmp", no_mangle)]
 pub unsafe extern "C" fn strncmp(s1: *const CChar, s2: *const CChar, n: usize) -> crate::CInt {
 	for i in 0..n as isize {

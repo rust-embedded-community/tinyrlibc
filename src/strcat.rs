@@ -4,8 +4,9 @@
 
 use crate::CChar;
 
-/// Rust implementation of C library function `strcat`. Passing NULL
-/// (core::ptr::null()) gives undefined behaviour.
+/// Rust implementation of C library function `strcat`.
+///
+/// Passing NULL (core::ptr::null()) gives undefined behaviour.
 #[cfg_attr(feature = "strcat", no_mangle)]
 pub unsafe extern "C" fn strcat(dest: *mut CChar, src: *const CChar) -> *const CChar {
 	crate::strcpy::strcpy(dest.add(crate::strlen::strlen(dest)), src);
