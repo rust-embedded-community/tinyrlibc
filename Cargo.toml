@@ -21,60 +21,61 @@ cc = "1.0"
 default = ["all"]
 all = [
     "abs",
-    "strcmp",
-    "strncmp",
-    "strncasecmp",
-    "strcpy",
-    "strcat",
-    "strncpy",
-    "strlen",
-    "strtol",
-    "strtoul",
-    "strtoll",
-    "strtoull",
-    "strtoimax",
-    "strtoumax",
-    "strstr",
-    "strchr",
-    "strrchr",
     "atoi",
-    "utoa",
-    "itoa",
-    "snprintf",
-    "isspace",
-    "isdigit",
     "isalpha",
+    "isdigit",
+    "isspace",
     "isupper",
+    "itoa",
     "memchr",
     "qsort",
+    "snprintf",
+    "strcat",
+    "strchr",
+    "strcmp",
+    "strcpy",
+    "strlen",
+    "strncasecmp",
+    "strncmp",
+    "strncpy",
+    "strrchr",
+    "strstr",
+    "strtoimax",
+    "strtol",
+    "strtoll",
+    "strtoul",
+    "strtoull",
+    "strtoumax",
+    "utoa",
 ]
+
 abs = []
-strcmp = []
-strncmp = []
-strncasecmp = []
-strcpy = []
-strcat = []
-strncpy = []
-strlen = []
-strtol = []
-strtoul = []
-strtoll = []
-strtoull = []
-strtoimax = []
-strtoumax = []
-strstr = []
-strchr = []
-strrchr = []
-atoi = []
-utoa = []
-itoa = []
-snprintf = []
-isspace = []
-isdigit = []
-isalpha = []
-isupper = []
 alloc = []
+atoi = []
+isalpha = []
+isdigit = []
+isspace = []
+isupper = []
+itoa = []
 memchr = []
 qsort = []
 signal = ["dep:portable-atomic"]
 signal-cs = ["portable-atomic/critical-section"]
+snprintf = []
+strcat = []
+strchr = []
+strcmp = []
+strcpy = []
+strlen = []
+strncasecmp = []
+strncmp = []
+strncpy = []
+strrchr = []
+strstr = []
+strtoimax = []
+strtol = []
+strtoll = []
+strtoul = []
+strtoull = []
+strtoumax = []
+utoa = []

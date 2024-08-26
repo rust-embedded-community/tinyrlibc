@@ -37,8 +37,10 @@ pub type CInt = ::core::ffi::c_int;
 /// `unsigned int`
 pub type CUInt = ::core::ffi::c_uint;
 
-/// Represents an 8-bit `char`. Rust does not (and will never) support
-/// platforms where `char` is not 8-bits long.
+/// Represents an 8-bit `char`.
+///
+/// Rust does not (and will never) support platforms where `char` is not 8-bits
+/// long.
 pub type CChar = u8;
 
 /// This allows you to iterate a null-terminated string in a relatively simple
@@ -49,8 +51,9 @@ pub struct CStringIter {
 }
 
 impl CStringIter {
-	/// Create a new iterator from a pointer to a null-terminated string. The
-	/// behaviour is undefined if the string is not null-terminated.
+	/// Create a new iterator from a pointer to a null-terminated string.
+	///
+	/// The behaviour is undefined if the string is not null-terminated.
 	pub fn new(s: *const CChar) -> CStringIter {
 		CStringIter { ptr: s, idx: 0 }
 	}
