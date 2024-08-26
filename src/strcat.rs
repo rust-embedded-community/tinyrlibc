@@ -18,7 +18,7 @@ mod test {
 
 	#[test]
 	fn simple() {
-		let mut dest = *b"hello\0";
+		let mut dest = *b"hello\0\0\0\0\0\0\0\0";
 		let src = *b" world\0";
 		let result = unsafe { strcat(dest.as_mut_ptr(), src.as_ptr()) };
 		assert_eq!(
