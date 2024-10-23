@@ -144,4 +144,149 @@ mod test {
 			0
 		);
 	}
+
+	#[test]
+	fn number_with_padding() {
+		let mut buf = [b'\0'; 128];
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%5u %5lu %5llu %5d %5ld %5lld %10x %10lx %10llX\0".as_ptr(),
+					CUInt::from(123u8),
+					CULong::from(123u8),
+					CULongLong::from(123u8),
+					CInt::from(-123i8),
+					CLong::from(-123i8),
+					CLongLong::from(-123i8),
+					CUInt::from(0xcafe1234u32),
+					CULong::from(0xcafe1234u32),
+					CULongLong::from(0xcafe1234u32),
+				)
+			},
+			68,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe {
+				strcmp(
+					buf.as_ptr() as *const u8,
+					b"  123   123   123  -123  -123  -123   cafe1234   cafe1234   CAFE1234\0"
+						as *const u8,
+				)
+			},
+			0
+		);
+	}
+
+	#[test]
+	fn number_with_zero_padding() {
+		let mut buf = [b'\0'; 128];
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%05u %05lu %05llu %05d %05ld %05lld %010x %010lx %010llX\0".as_ptr(),
+					CUInt::from(123u8),
+					CULong::from(123u8),
+					CULongLong::from(123u8),
+					CInt::from(-123i8),
+					CLong::from(-123i8),
+					CLongLong::from(-123i8),
+					CUInt::from(0xcafe1234u32),
+					CULong::from(0xcafe1234u32),
+					CULongLong::from(0xcafe1234u32),
+				)
+			},
+			68,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe {
+				strcmp(
+					buf.as_ptr() as *const u8,
+					b"00123 00123 00123 -0123 -0123 -0123 00cafe1234 00cafe1234 00CAFE1234\0"
+						as *const u8,
+				)
+			},
+			0
+		);
+	}
+
+	#[test]
+	fn number_with_precision() {
+		let mut buf = [b'\0'; 128];
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%.5u %.5lu %.5llu %.5d %.5ld %.5lld %.10x %.10lx %.10llX\0".as_ptr(),
+					CUInt::from(123u8),
+					CULong::from(123u8),
+					CULongLong::from(123u8),
+					CInt::from(-123i8),
+					CLong::from(-123i8),
+					CLongLong::from(-123i8),
+					CUInt::from(0xcafe1234u32),
+					CULong::from(0xcafe1234u32),
+					CULongLong::from(0xcafe1234u32),
+				)
+			},
+			71,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe {
+				strcmp(
+					buf.as_ptr() as *const u8,
+					b"00123 00123 00123 -00123 -00123 -00123 00cafe1234 00cafe1234 00CAFE1234\0"
+						as *const u8,
+				)
+			},
+			0
+		);
+	}
+
+	#[test]
+	fn number_with_width_and_precision() {
+		let mut buf = [b'\0'; 128];
+		assert_eq!(
+			unsafe {
+				snprintf(
+					buf.as_mut_ptr(),
+					buf.len(),
+					"%10.5u %2.5lu %10.5llu %10.5d %2.5ld %10.5lld %15.10x %5.10lx %5.3llX\0"
+						.as_ptr(),
+					CUInt::from(123u8),
+					CULong::from(123u8),
+					CULongLong::from(123u8),
+					CInt::from(-123i8),
+					CLong::from(-123i8),
+					CLongLong::from(-123i8),
+					CUInt::from(0xcafe1234u32),
+					CULong::from(0xcafe1234u32),
+					CULongLong::from(0xcafe1234u32),
+				)
+			},
+			92,
+			"{}",
+			String::from_utf8_lossy(&buf).escape_debug(),
+		);
+		assert_eq!(
+			unsafe {
+				strcmp(
+					buf.as_ptr() as *const u8,
+					b"     00123 00123      00123     -00123 -00123     -00123      00cafe1234 00cafe1234 CAFE1234\0"
+						as *const u8,
+				)
+			},
+			0
+		);
+	}
 }
