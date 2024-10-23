@@ -26,6 +26,10 @@ mod abs;
 #[cfg(feature = "abs")]
 pub use self::abs::abs;
 
+mod rand_r;
+#[cfg(feature = "rand_r")]
+pub use self::rand_r::rand_r;
+
 mod strcmp;
 #[cfg(feature = "strcmp")]
 pub use self::strcmp::strcmp;
