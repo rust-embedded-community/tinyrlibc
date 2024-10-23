@@ -35,6 +35,7 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 * snprintf
 * vsnprintf
 * qsort
+* rand
 * alloc (optional)
     * malloc
     * calloc
