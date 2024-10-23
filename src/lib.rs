@@ -29,6 +29,10 @@ pub use self::abs::abs;
 mod rand_r;
 #[cfg(feature = "rand_r")]
 pub use self::rand_r::rand_r;
+#[cfg(feature = "rand")]
+mod rand;
+#[cfg(feature = "rand")]
+pub use self::rand::{rand, srand};
 
 mod strcmp;
 #[cfg(feature = "strcmp")]
