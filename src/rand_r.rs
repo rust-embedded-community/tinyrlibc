@@ -3,6 +3,10 @@
 //! Licensed under the Blue Oak Model Licence 1.0.0
 use core::ffi::{c_int, c_uint};
 
+#[cfg_attr(not(feature = "rand_r"), export_name = "tinyrlibc_RAND_MAX")]
+#[cfg_attr(feature = "rand_r", no_mangle)]
+pub static RAND_MAX: c_int = 0x7FFF_FFFC as _;
+
 /// Rust implementation of C library function `rand_r`
 ///
 /// Passing NULL (core::ptr::null()) gives undefined behaviour.
@@ -29,7 +33,7 @@ pub unsafe extern "C" fn rand_r(seedp: *mut c_uint) -> c_int {
 
 	*seedp = next;
 
-	result
+	result - 1
 }
 
 #[cfg(test)]
