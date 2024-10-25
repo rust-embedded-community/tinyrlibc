@@ -87,7 +87,7 @@ extern unsigned long int strtoul(const char* str, char** endptr, int base);
  * - c (char)
  * - s (null-terminated string)
  * - % (literal percent sign)
- * - qualifiers: l, ll, z
+ * - qualifiers: l, ll, z, width, (non-string) precision, left-space-pad, zero-pad
  *
  * Does not support:
  *
@@ -99,7 +99,7 @@ extern unsigned long int strtoul(const char* str, char** endptr, int base);
  * - f (decimal floating point)
  * - g (the shorter of %e and %f)
  * - G (the shorter of %E and %f)
- * - qualifiers: L, width, (non-string) precision, -, +, space-pad, zero-pad, etc
+ * - qualifiers: L, -, +, right-pad, etc
  *
  * @param str the output buffer to write to
  * @param size the size of the output buffer
@@ -153,7 +153,7 @@ int vsnprintf(
                }
                else if ( is_long == 2 )
                {
-                  // Render %lu
+                  // Render %llu
                   ll = va_arg( ap, unsigned long long );
                }
                else if ( is_long == 1 )
@@ -212,7 +212,7 @@ int vsnprintf(
                signed long long ll = 0;
                if ( is_long == 2 )
                {
-                  // Render %ld
+                  // Render %lld
                   ll = va_arg( ap, signed long long );
                }
                else if ( is_long == 1 )
@@ -440,7 +440,7 @@ static void write_padding(char* restrict str, size_t size, size_t* written, size
    {
       zero_pad_len = pad_len;
    }
-   // Apply whilespace padding if needed
+   // Apply whitespace padding if needed
    pad_len = (zero_pad_len > pad_len) ? 0 : pad_len - zero_pad_len;
    for (unsigned long i = 0; i < pad_len; i++)
    {
