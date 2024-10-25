@@ -9,12 +9,10 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded-community/tinyrlibc"
 
 [dependencies]
-critical-section = { version = "1.2.0", optional = true }
 portable-atomic = { version = "1.6.0", optional = true }
 
 [dev-dependencies]
 static-alloc = "0.2.4"
-critical-section = { version = "1.2.0", features = ["std"] }
 
 [build-dependencies]
 cc = "1.0"
@@ -63,7 +61,7 @@ itoa = []
 memchr = []
 qsort = []
 rand_r = []
-rand = ["dep:critical-section"]
+rand = ["rand_r", "dep:portable-atomic"]
 signal = ["dep:portable-atomic"]
 signal-cs = ["portable-atomic/critical-section"]
 snprintf = []

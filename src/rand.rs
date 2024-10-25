@@ -1,73 +1,61 @@
 //! Rust implementation of C library functions `rand` and `srand`
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
-use core::ffi::{c_int, c_uint};
+use core::{
+	ffi::{c_int, c_uint},
+	sync::atomic::Ordering,
+};
 
-struct GnuRand {
-	r: [u32; 344],
-	n: usize,
-}
+use portable_atomic::AtomicU32;
 
-impl GnuRand {
-	pub fn new(mut seed: u32) -> GnuRand {
-		let mut r = [0u32; 344];
-
-		if seed == 0 {
-			// Make sure seed is not 0
-			seed = 1;
-		}
-
-		r[0] = seed;
-		for i in 1..31 {
-			// This does:
-			// state[i] = (16807 * state[i - 1]) % 2147483647;
-			// but avoids overflowing 31 bits.
-			let hi = (r[i - 1] / 127773) as i32;
-			let lo = (r[i - 1] % 127773) as i32;
-			let mut word = 16807 * lo - 2836 * hi;
-			if word < 0 {
-				word += i32::MAX;
-			}
-			r[i] = word as u32;
-		}
-		for i in 31..34 {
-			r[i] = r[i - 31];
-		}
-		for i in 34..344 {
-			r[i] = r[i - 31].wrapping_add(r[i - 3]);
-		}
-
-		GnuRand { r, n: 0 }
-	}
-
-	pub fn next(&mut self) -> i32 {
-		let x = self.r[(self.n + 313) % 344].wrapping_add(self.r[(self.n + 341) % 344]);
-		self.r[self.n % 344] = x;
-		self.n = (self.n + 1) % 344;
-		(x >> 1) as i32
-	}
-}
-
-static mut RAND: Option<GnuRand> = None;
+// static mut RAND: Option<GnuRand> = None;
+static RAND_STATE: AtomicU32 = AtomicU32::new(0x0);
 
 /// Rust implementation of C library function `srand`
-///
-/// Relies on [`critical-section`](https://docs.rs/critical-section/1.2.0/critical_section/) for thread-safety
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn srand(seed: c_uint) {
-	let rnd = GnuRand::new(seed);
-	critical_section::with(|_| unsafe { RAND = Some(rnd) });
+	RAND_STATE.store(seed, Ordering::Release);
 }
 
 /// Rust implementation of C library function `rand`
 ///
-/// Relies on [`critical-section`](https://docs.rs/critical-section/1.2.0/critical_section/) for thread-safety
+/// Returns a pseudo-random integer in the range 0 to `RAND_MAX` (inclusive).
+/// May produce the same value in a row if called from multiple threads on platforms not supporting CAS operations.
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn rand() -> c_int {
-	critical_section::with(|_| {
-		let rnd = unsafe { RAND.get_or_insert_with(|| GnuRand::new(1)) };
-		rnd.next()
-	})
+	// Atomically update the global LFSR state using compare_and_swap if available
+	#[allow(dead_code)]
+	fn with_cas() -> c_int {
+		let mut current_state = RAND_STATE.load(Ordering::Relaxed);
+		let mut new_state = current_state;
+		let mut result = unsafe { crate::rand_r(&mut new_state as *mut _) };
+
+		loop {
+			match RAND_STATE.compare_exchange_weak(
+				current_state,
+				new_state,
+				Ordering::SeqCst,
+				Ordering::Relaxed,
+			) {
+				Ok(_) => break,
+				Err(c) => current_state = c,
+			}
+			new_state = current_state;
+			result = unsafe { crate::rand_r(&mut new_state as *mut _) };
+		}
+
+		result as _
+	}
+	// Fallback to non-atomic operation if compare_and_swap is not available
+	#[allow(dead_code)]
+	fn without_cas() -> c_int {
+		let mut current_state = RAND_STATE.load(Ordering::Acquire);
+		let result = unsafe { crate::rand_r(&mut current_state as *mut _) };
+		RAND_STATE.store(current_state, Ordering::Release);
+		result as _
+	}
+	portable_atomic::cfg_has_atomic_cas! { with_cas() }
+	portable_atomic::cfg_no_atomic_cas! { without_cas() }
 }
 
 #[cfg(test)]
@@ -75,21 +63,12 @@ mod test {
 	use super::*;
 	#[test]
 	fn test_rand() {
-		unsafe {
-			// Values taken from glibc implementation
-			assert_eq!(rand(), 1804289383);
-			assert_eq!(rand(), 846930886);
-			assert_eq!(rand(), 1681692777);
-		}
-	}
-	#[test]
-	fn test_srand() {
-		unsafe {
-			srand(5);
-			// Values taken from glibc implementation
-			assert_eq!(rand(), 590011675);
-			assert_eq!(rand(), 99788765);
-			assert_eq!(rand(), 2131925610);
-		}
+		assert_eq!(rand(), 1012483);
+		assert_eq!(rand(), 1716955678);
+		assert_eq!(rand(), 1792309081);
+		srand(5);
+		assert_eq!(rand(), 234104183);
+		assert_eq!(rand(), 1214203243);
+		assert_eq!(rand(), 1803669307);
 	}
 }

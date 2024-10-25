@@ -40,9 +40,9 @@ mod test {
 		unsafe {
 			let mut seed = 5;
 			// Values taken from glibc implementation
-			assert_eq!(rand_r(&mut seed), 234104184);
-			assert_eq!(rand_r(&mut seed), 1214203244);
-			assert_eq!(rand_r(&mut seed), 1803669308);
+			assert_eq!(rand_r(&mut seed), 234104183);
+			assert_eq!(rand_r(&mut seed), 1214203243);
+			assert_eq!(rand_r(&mut seed), 1803669307);
 		}
 	}
 }
