@@ -27,6 +27,7 @@ mod test {
 	}
 
 	/// Handle the buffer that `snprintf` needs
+	#[track_caller]
 	fn asprintf<F>(fmt: &str, expected: &str, f: F)
 	where
 		F: FnOnce(*mut CChar, usize, *const CChar) -> i32,
