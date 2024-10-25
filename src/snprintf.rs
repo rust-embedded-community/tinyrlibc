@@ -95,6 +95,34 @@ mod test {
 	}
 
 	#[test]
+	fn int_min() {
+		asprintf(
+			"%d",
+			&format!("{}", CInt::min_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CInt::min_value()) },
+		);
+		asprintf(
+			"%lld",
+			&format!("{}", CLongLong::min_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CLongLong::min_value()) },
+		);
+	}
+
+	#[test]
+	fn int_max() {
+		asprintf(
+			"%d",
+			&format!("{}", CInt::max_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CInt::max_value()) },
+		);
+		asprintf(
+			"%lld",
+			&format!("{}", CLongLong::max_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CLongLong::max_value()) },
+		);
+	}
+
+	#[test]
 	fn non_null_terminated_with_length() {
 		asprintf("%.*s", "01234", |buf, len, fmt: *const u8| unsafe {
 			snprintf(buf, len, fmt, 5, c"01234567890123456789".cp())
@@ -244,6 +272,16 @@ mod test {
 			snprintf(buf, len, fmt, CInt::from(-123i8))
 		});
 		asprintf("%5.0d", " -123", |buf, len, fmt| unsafe {
+			snprintf(buf, len, fmt, CInt::from(-123i8))
+		});
+
+		asprintf("%05.4d", "-0123", |buf, len, fmt| unsafe {
+			snprintf(buf, len, fmt, CInt::from(-123i8))
+		});
+		asprintf("%05.3d", " -123", |buf, len, fmt| unsafe {
+			snprintf(buf, len, fmt, CInt::from(-123i8))
+		});
+		asprintf("%05.0d", " -123", |buf, len, fmt| unsafe {
 			snprintf(buf, len, fmt, CInt::from(-123i8))
 		});
 	}

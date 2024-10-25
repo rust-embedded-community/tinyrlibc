@@ -210,6 +210,7 @@ int vsnprintf(
             {
                char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
                signed long long ll = 0;
+               unsigned long long ull = 0;
                if ( is_long == 2 )
                {
                   // Render %lld
@@ -226,11 +227,8 @@ int vsnprintf(
                   ll = va_arg( ap, signed int );
                }
                bool is_negative = ll < 0;
-               if (is_negative)
-               {
-                  ll = -ll;
-               }
-               itoa( ll, s, sizeof(s), 10 );
+               ull = is_negative ? -ll : ll;
+               utoa( ull, s, sizeof(s), 10 );
                write_padding( str, size, &written, strlen(s), width, precision, zero_pad, is_negative );
                for ( const char* p = s; *p != '\0'; p++ )
                {
@@ -430,13 +428,16 @@ static void write_padding(char* restrict str, size_t size, size_t* written, size
    unsigned long zero_pad_len = 0;
    if ( precision != 0 && precision != (unsigned long)-1 )
    {
-      zero_pad_len = precision > len ? precision - len : 0;
       if ( is_negative )
       {
-         zero_pad_len++;
+         zero_pad_len = precision >= len ? precision - len + 1 : 0;
+      }
+      else
+      {
+         zero_pad_len = precision >= len ? precision - len : 0;
       }
    }
-   else if ( zero_pad )
+   else if ( zero_pad && precision == (unsigned long)-1 )
    {
       zero_pad_len = pad_len;
    }
