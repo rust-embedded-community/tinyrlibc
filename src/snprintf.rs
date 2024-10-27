@@ -3,7 +3,6 @@
 //! Copyright (c) Jonathan 'theJPster' Pallant 2019
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-#[cfg(feature = "snprintf")]
 #[cfg(test)]
 mod test {
 	extern "C" {
