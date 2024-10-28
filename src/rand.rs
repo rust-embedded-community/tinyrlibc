@@ -17,45 +17,35 @@ pub extern "C" fn srand(seed: c_uint) {
 	RAND_STATE.store(seed, Ordering::Release);
 }
 
-/// Rust implementation of C library function `rand`
+/// Rust implementation of C library function `rand`.
 ///
-/// Returns a pseudo-random integer in the range 0 to `RAND_MAX` (inclusive).
-/// May produce the same value in a row if called from multiple threads on platforms not supporting CAS operations.
+/// Returns a pseudo-random integer in the range 0 to [`RAND_MAX`](crate::RAND_MAX) (inclusive).
+/// This requires CAS operations. If your platform does not support them natively,
+/// you either have to enable the `rand-cs` feature of `tinyrlibc`,
+/// or the [`critical-section`](https://docs.rs/portable-atomic/1.9.0/portable_atomic/#optional-features-critical-section) feature,
+/// or the [`unsafe-assume-single-core`](https://docs.rs/portable-atomic/1.9.0/portable_atomic/#optional-features-unsafe-assume-single-core) feature
+/// in [`portable-atomic`](https://crates.io/crates/portable-atomic).
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn rand() -> c_int {
-	// Atomically update the global LFSR state using compare_and_swap if available
-	#[allow(dead_code)]
-	fn with_cas() -> c_int {
-		let mut current_state = RAND_STATE.load(Ordering::Relaxed);
-		let mut new_state = current_state;
-		let mut result = unsafe { crate::rand_r(&mut new_state as *mut _) };
+	let mut current_state = RAND_STATE.load(Ordering::Relaxed);
+	let mut new_state = current_state;
+	let mut result = unsafe { crate::rand_r(&mut new_state as *mut _) };
 
-		loop {
-			match RAND_STATE.compare_exchange_weak(
-				current_state,
-				new_state,
-				Ordering::SeqCst,
-				Ordering::Relaxed,
-			) {
-				Ok(_) => break,
-				Err(c) => current_state = c,
-			}
-			new_state = current_state;
-			result = unsafe { crate::rand_r(&mut new_state as *mut _) };
+	loop {
+		match RAND_STATE.compare_exchange_weak(
+			current_state,
+			new_state,
+			Ordering::SeqCst,
+			Ordering::Relaxed,
+		) {
+			Ok(_) => break,
+			Err(c) => current_state = c,
 		}
+		new_state = current_state;
+		result = unsafe { crate::rand_r(&mut new_state as *mut _) };
+	}
 
-		result as _
-	}
-	// Fallback to non-atomic operation if compare_and_swap is not available
-	#[allow(dead_code)]
-	fn without_cas() -> c_int {
-		let mut current_state = RAND_STATE.load(Ordering::Acquire);
-		let result = unsafe { crate::rand_r(&mut current_state as *mut _) };
-		RAND_STATE.store(current_state, Ordering::Release);
-		result as _
-	}
-	portable_atomic::cfg_has_atomic_cas! { with_cas() }
-	portable_atomic::cfg_no_atomic_cas! { without_cas() }
+	result as _
 }
 
 #[cfg(test)]
