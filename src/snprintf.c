@@ -29,6 +29,9 @@
 static void write_output(
    char out, char* restrict str, size_t max, size_t* written );
 
+static void write_padding(
+   char* restrict str, size_t size, size_t* written, size_t len, unsigned long width, unsigned long precision, bool zero_pad, bool is_negative );
+
 static char upcase(char c);
 
 /* ======================================================================== *
@@ -84,7 +87,7 @@ extern unsigned long int strtoul(const char* str, char** endptr, int base);
  * - c (char)
  * - s (null-terminated string)
  * - % (literal percent sign)
- * - qualifiers: l, ll, z
+ * - qualifiers: l, ll, z, width, (non-string) precision, left-space-pad, zero-pad
  *
  * Does not support:
  *
@@ -96,7 +99,7 @@ extern unsigned long int strtoul(const char* str, char** endptr, int base);
  * - f (decimal floating point)
  * - g (the shorter of %e and %f)
  * - G (the shorter of %E and %f)
- * - qualifiers: L, width, (non-string) precision, -, +, space-pad, zero-pad, etc
+ * - qualifiers: L, -, +, right-pad, etc
  *
  * @param str the output buffer to write to
  * @param size the size of the output buffer
@@ -113,6 +116,8 @@ int vsnprintf(
    int is_long = 0;
    bool is_size_t = false;
    unsigned long precision = -1;
+   unsigned long width = 0;
+   bool zero_pad = false;
 
    while ( *fmt )
    {
@@ -138,45 +143,31 @@ int vsnprintf(
             is_escape = true;
             break;
          case 'u':
-            if ( is_size_t )
             {
-               // Render %zu
                char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               size_t su = va_arg( ap, size_t );
-               utoa( su, s, sizeof(s), 10 );
-               for ( const char* p = s; *p != '\0'; p++ )
+               unsigned long long ll = 0;
+               if ( is_size_t )
                {
-                  write_output( *p, str, size, &written );
+                  // Render %zu
+                  ll = va_arg( ap, size_t );
                }
-            }
-            else if ( is_long == 2 )
-            {
-               // Render %lu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long long ll = va_arg( ap, unsigned long long );
+               else if ( is_long == 2 )
+               {
+                  // Render %llu
+                  ll = va_arg( ap, unsigned long long );
+               }
+               else if ( is_long == 1 )
+               {
+                  // Render %lu
+                  ll = va_arg( ap, unsigned long );
+               }
+               else
+               {
+                  // Render %u
+                  ll = va_arg( ap, unsigned int );
+               }
                utoa( ll, s, sizeof(s), 10 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            else if ( is_long == 1 )
-            {
-               // Render %lu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long l = va_arg( ap, unsigned long );
-               utoa( l, s, sizeof(s), 10 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            else
-            {
-               // Render %u
-               unsigned int i = va_arg( ap, unsigned int );
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               utoa( i, s, sizeof(s), 10 );
+               write_padding( str, size, &written, strlen(s), width, precision, zero_pad, false );
                for ( const char* p = s; *p != '\0'; p++ )
                {
                   write_output( *p, str, size, &written );
@@ -184,127 +175,61 @@ int vsnprintf(
             }
             break;
          case 'x':
-            if ( is_size_t )
-            {
-               // Render %zu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               size_t su = va_arg( ap, size_t );
-               utoa( su, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            else if ( is_long == 2 )
-            {
-               // Render %llu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long long ll = va_arg( ap, unsigned long long );
-               utoa( ll, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            else if ( is_long == 1 )
-            {
-               // Render %lu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long l = va_arg( ap, unsigned long );
-               utoa( l, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            else
-            {
-               // Render %u
-               unsigned int i = va_arg( ap, unsigned int );
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               utoa( i, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( *p, str, size, &written );
-               }
-            }
-            break;
          case 'X':
-            if ( is_size_t )
+            // Render %x and %X
             {
-               // Render %zu
+               unsigned long long ll;
                char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               size_t su = va_arg( ap, size_t );
-               utoa( su, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
+               if ( is_size_t )
                {
-                  write_output( upcase(*p), str, size, &written );
+                  ll = va_arg( ap, size_t );
                }
-            }
-            else if ( is_long == 2 )
-            {
-               // Render %llu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long long ll = va_arg( ap, unsigned long long );
+               else if ( is_long == 2 )
+               {
+                  ll = va_arg( ap, unsigned long long );
+               }
+               else if ( is_long == 1 )
+               {
+                  ll = va_arg( ap, unsigned long );
+               }
+               else
+               {
+                  ll = va_arg( ap, unsigned int );
+               }
                utoa( ll, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
+               write_padding( str, size, &written, strlen(s), width, precision, zero_pad, false );
+               for (const char* p = s; *p != '\0'; p++)
                {
-                  write_output( upcase(*p), str, size, &written );
-               }
-            }
-            else if ( is_long == 1 )
-            {
-               // Render %lu
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               unsigned long l = va_arg( ap, unsigned long );
-               utoa( l, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( upcase(*p), str, size, &written );
-               }
-            }
-            else
-            {
-               // Render %u
-               unsigned int i = va_arg( ap, unsigned int );
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               utoa( i, s, sizeof(s), 16 );
-               for ( const char* p = s; *p != '\0'; p++ )
-               {
-                  write_output( upcase(*p), str, size, &written );
+                  char output_char = (*fmt == 'X') ? upcase(*p) : *p;
+                  write_output( output_char, str, size, &written );
                }
             }
             break;
          case 'i':
          case 'd':
-            if ( is_long == 2 )
             {
-               // Render %ld
                char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               signed long long ll = va_arg( ap, signed long long );
-               itoa( ll, s, sizeof(s), 10 );
-               for ( const char* p = s; *p != '\0'; p++ )
+               signed long long ll = 0;
+               unsigned long long ull = 0;
+               if ( is_long == 2 )
                {
-                  write_output( *p, str, size, &written );
+                  // Render %lld
+                  ll = va_arg( ap, signed long long );
                }
-            }
-            else if ( is_long == 1 )
-            {
-               // Render %ld
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               signed long l = va_arg( ap, signed long );
-               itoa( l, s, sizeof(s), 10 );
-               for ( const char* p = s; *p != '\0'; p++ )
+               else if ( is_long == 1 )
                {
-                  write_output( *p, str, size, &written );
+                  // Render %ld
+                  ll = va_arg( ap, signed long );
                }
-            }
-            else
-            {
-               // Render %d
-               signed int i = va_arg( ap, signed int );
-               char s[MAXIMUM_NUMBER_LENGTH] = { 0 };
-               itoa( i, s, sizeof(s), 10 );
+               else
+               {
+                  // Render %d
+                  ll = va_arg( ap, signed int );
+               }
+               bool is_negative = ll < 0;
+               ull = is_negative ? -ll : ll;
+               utoa( ull, s, sizeof(s), 10 );
+               write_padding( str, size, &written, strlen(s), width, precision, zero_pad, is_negative );
                for ( const char* p = s; *p != '\0'; p++ )
                {
                   write_output( *p, str, size, &written );
@@ -323,6 +248,12 @@ int vsnprintf(
             {
                const char *s = va_arg( ap, const char* );
                unsigned long count = precision;
+               
+               size_t len = strlen(s);
+               if (precision != (unsigned long)-1 && precision < len) {
+                  len = precision;
+               }
+               write_padding( str, size, &written, len, width, precision, false, false );
 
                while (count > 0 && *s != '\0')
                {
@@ -336,7 +267,7 @@ int vsnprintf(
             }
             break;
          case '.':
-            // Render a precision specifier
+            // Parse a precision specifier
             {
                // Next up is either a number or a '*' that signifies that the number is in the arguments list
                char next = *++fmt;
@@ -355,6 +286,27 @@ int vsnprintf(
 
                is_escape = true;
             }
+            break;
+         case '0':
+            // Parse zero padding specifier
+            zero_pad = true;
+            fmt++;
+            /* fall through */
+         case '1':
+         case '2':
+         case '3':
+         case '4':
+         case '5':
+         case '6':
+         case '7':
+         case '8':
+         case '9':
+            // Parse padding specifier
+            width = strtoul(fmt, (char**) &fmt, 10);
+            // Strtoul sets the fmt pointer to the char after the number,
+            // however the code expects the char before that.
+            fmt--;
+            is_escape = true;
             break;
          case '%':
             write_output( '%', str, size, &written );
@@ -378,6 +330,9 @@ int vsnprintf(
             is_escape = true;
             is_long = 0;
             is_size_t = false;
+            zero_pad  = false;
+            width = 0;
+            precision = -1;
             break;
          default:
             write_output( *fmt, str, size, &written );
@@ -448,6 +403,58 @@ static void write_output(
    else
    {
       *written = *written + 1;
+   }
+}
+
+/**
+ * write_padding - Write padding to the output buffer.
+ * 
+ * @param str the buffer to write to
+ * @param size the total size of `str`
+ * @param written pass in the number of characters in the buffer; is increased
+ *    by one regardless of whether we wrote to the buffer
+ * @param len the length of the string to write
+ * @param width the total width of the padding
+ * @param precision the precision of the padding
+ * @param zero_pad whether to zero pad the string
+ * @param is_negative whether the number is negative
+ */
+static void write_padding(char* restrict str, size_t size, size_t* written, size_t len, unsigned long width, unsigned long precision, bool zero_pad, bool is_negative) {
+   if ( is_negative )
+   {
+      len++;
+   }
+   unsigned long pad_len = width > len ? width - len : 0;
+   unsigned long zero_pad_len = 0;
+   if ( precision != 0 && precision != (unsigned long)-1 )
+   {
+      if ( is_negative )
+      {
+         zero_pad_len = precision >= len ? precision - len + 1 : 0;
+      }
+      else
+      {
+         zero_pad_len = precision >= len ? precision - len : 0;
+      }
+   }
+   else if ( zero_pad && precision == (unsigned long)-1 )
+   {
+      zero_pad_len = pad_len;
+   }
+   // Apply whitespace padding if needed
+   pad_len = (zero_pad_len > pad_len) ? 0 : pad_len - zero_pad_len;
+   for (unsigned long i = 0; i < pad_len; i++)
+   {
+      write_output( ' ', str, size, written );
+   }
+   // Apply zero padding if needed
+   if (is_negative)
+   {
+      write_output( '-', str, size, written );
+   }
+   for (unsigned long i = 0; i < zero_pad_len; i++)
+   {
+      write_output( '0', str, size, written );
    }
 }
 
