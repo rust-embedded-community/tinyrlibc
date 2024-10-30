@@ -8,13 +8,12 @@ use core::{
 
 use portable_atomic::AtomicU32;
 
-// static mut RAND: Option<GnuRand> = None;
 static RAND_STATE: AtomicU32 = AtomicU32::new(0x0);
 
 /// Rust implementation of C library function `srand`
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn srand(seed: c_uint) {
-	RAND_STATE.store(seed, Ordering::Release);
+	RAND_STATE.store(seed, Ordering::Relaxed);
 }
 
 /// Rust implementation of C library function `rand`.
@@ -28,24 +27,20 @@ pub extern "C" fn srand(seed: c_uint) {
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn rand() -> c_int {
 	let mut current_state = RAND_STATE.load(Ordering::Relaxed);
-	let mut new_state = current_state;
-	let mut result = unsafe { crate::rand_r(&mut new_state as *mut _) };
 
 	loop {
+		let mut new_state = current_state;
+		let result = unsafe { crate::rand_r(&mut new_state as *mut _) };
 		match RAND_STATE.compare_exchange_weak(
 			current_state,
 			new_state,
-			Ordering::SeqCst,
+			Ordering::Relaxed,
 			Ordering::Relaxed,
 		) {
-			Ok(_) => break,
+			Ok(_) => return result as _,
 			Err(c) => current_state = c,
 		}
-		new_state = current_state;
-		result = unsafe { crate::rand_r(&mut new_state as *mut _) };
 	}
-
-	result as _
 }
 
 #[cfg(test)]
