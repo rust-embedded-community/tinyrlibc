@@ -2,7 +2,7 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 use core::{
-	ffi::{c_int, c_uint, c_ulong},
+	ffi::{c_int, c_uint},
 	sync::atomic::Ordering,
 };
 
@@ -22,7 +22,7 @@ pub extern "C" fn srand(seed: c_uint) {
 /// Rust implementation of C library function `rand`.
 #[cfg_attr(feature = "rand", no_mangle)]
 pub extern "C" fn rand() -> c_int {
-	let mut state = RAND_STATE.load(Ordering::Relaxed) as c_ulong;
+	let mut state = RAND_STATE.load(Ordering::Relaxed) as c_uint;
 	let result = unsafe { crate::rand_r(&mut state) };
 	RAND_STATE.store(state as u32, Ordering::Relaxed);
 	result
