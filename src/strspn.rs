@@ -19,13 +19,14 @@ pub unsafe extern "C" fn strspn(s: *const CChar, charset: *const CChar) -> usize
 
 	let charset = unsafe { core::ffi::CStr::from_ptr(charset.cast()) };
 
-	for (idx, b) in s.to_bytes().iter().enumerate() {
+	let bytes = s.to_bytes();
+	for (idx, b) in bytes.iter().enumerate() {
 		if !is_c_in_charset(*b, charset) {
 			return idx;
 		}
 	}
 
-	s.count_bytes()
+	bytes.len()
 }
 
 fn is_c_in_charset(c: u8, charset: &core::ffi::CStr) -> bool {
