@@ -32,6 +32,7 @@ mod strncasecmp;
 mod strncmp;
 mod strncpy;
 mod strrchr;
+mod strspn;
 mod strstr;
 mod strtol;
 
@@ -82,6 +83,8 @@ pub use self::strncmp::strncmp;
 pub use self::strncpy::strncpy;
 #[cfg(feature = "strrchr")]
 pub use self::strrchr::strrchr;
+#[cfg(feature = "strspn")]
+pub use self::strspn::strspn;
 #[cfg(feature = "strstr")]
 pub use self::strstr::strstr;
 #[cfg(feature = "atoi")]
