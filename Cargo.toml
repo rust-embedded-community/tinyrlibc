@@ -29,6 +29,8 @@ all = [
     "itoa",
     "memchr",
     "qsort",
+    "rand_r",
+    "rand",
     "snprintf",
     "strcat",
     "strchr",
@@ -59,6 +61,9 @@ isupper = []
 itoa = []
 memchr = []
 qsort = []
+rand_r = []
+rand = ["rand_r", "dep:portable-atomic"]
+rand_max_i16 = []
 signal = ["dep:portable-atomic"]
 signal-cs = ["portable-atomic/critical-section"]
 snprintf = []
