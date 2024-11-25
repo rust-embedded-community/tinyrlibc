@@ -27,6 +27,7 @@ mod strcat;
 mod strchr;
 mod strcmp;
 mod strcpy;
+mod strcspn;
 mod strlen;
 mod strncasecmp;
 mod strncmp;
@@ -73,6 +74,8 @@ pub use self::strchr::strchr;
 pub use self::strcmp::strcmp;
 #[cfg(feature = "strcpy")]
 pub use self::strcpy::strcpy;
+#[cfg(feature = "strcspn")]
+pub use self::strcspn::strcspn;
 #[cfg(feature = "strlen")]
 pub use self::strlen::strlen;
 #[cfg(feature = "strncasecmp")]

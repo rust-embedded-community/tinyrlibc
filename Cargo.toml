@@ -42,6 +42,7 @@ all = [
     "strncpy",
     "strrchr",
     "strspn",
+    "strcspn",
     "strstr",
     "strtoimax",
     "strtol",
@@ -78,6 +79,7 @@ strncmp = []
 strncpy = []
 strrchr = []
 strspn = []
+strcspn = []
 strstr = []
 strtoimax = []
 strtol = []
