@@ -14,7 +14,7 @@
 [#27]: https://github.com/rust-embedded-community/tinyrlibc/pull/27
 [#28]: https://github.com/rust-embedded-community/tinyrlibc/pull/28
 [#29]: https://github.com/rust-embedded-community/tinyrlibc/pull/29
-[#32]: https://github.com/rust-embedded-community/tinyrlibc/pull/30
+[#30]: https://github.com/rust-embedded-community/tinyrlibc/pull/30
 [#32]: https://github.com/rust-embedded-community/tinyrlibc/pull/32
 [#34]: https://github.com/rust-embedded-community/tinyrlibc/pull/34
 
