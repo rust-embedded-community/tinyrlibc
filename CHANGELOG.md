@@ -4,9 +4,19 @@
 
 * [#26] - Add `memchr` 
 * [#27] - Add `qsort`
+* [#28] - Add `strcat` and `strchr`
+* [#29] - Clean up docs
+* [#30] - Add padding in `sprintf`
+* [#32] - Add `rand`, `srand` and `rand_r`
+* [#34] - Add `strspn` and `strcspn`
 
 [#26]: https://github.com/rust-embedded-community/tinyrlibc/pull/26
 [#27]: https://github.com/rust-embedded-community/tinyrlibc/pull/27
+[#28]: https://github.com/rust-embedded-community/tinyrlibc/pull/28
+[#29]: https://github.com/rust-embedded-community/tinyrlibc/pull/29
+[#30]: https://github.com/rust-embedded-community/tinyrlibc/pull/30
+[#32]: https://github.com/rust-embedded-community/tinyrlibc/pull/32
+[#34]: https://github.com/rust-embedded-community/tinyrlibc/pull/34
 
 ## v0.4.0 (2024-03-22)
 
