@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.5.0 (2024-11-29)
+
 * [#26] - Add `memchr` 
 * [#27] - Add `qsort`
 * [#28] - Add `strcat` and `strchr`
