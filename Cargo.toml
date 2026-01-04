@@ -19,6 +19,7 @@ cc = "1.0"
 
 [features]
 default = ["all"]
+# should enable all libc functions gated behind features
 all = [
     "abs",
     "atoi",
@@ -53,8 +54,8 @@ all = [
     "utoa",
 ]
 
+# libc functions gated behind features
 abs = []
-alloc = []
 atoi = []
 isalpha = []
 isdigit = []
@@ -65,9 +66,6 @@ memchr = []
 qsort = []
 rand_r = []
 rand = ["rand_r", "dep:portable-atomic"]
-rand_max_i16 = []
-signal = ["dep:portable-atomic"]
-signal-cs = ["portable-atomic/critical-section"]
 snprintf = []
 strcat = []
 strchr = []
@@ -88,3 +86,18 @@ strtoul = []
 strtoull = []
 strtoumax = []
 utoa = []
+
+# options for rand
+rand_max_i16 = []
+
+# malloc/free support
+alloc = []
+
+# Signal support is optional because it requires atomics
+signal = ["dep:portable-atomic"]
+# bring in critical-section based portable atomics
+signal-cs = ["portable-atomic/critical-section"]
+
+[package.metadata.docs.rs]
+# Features to pass to Cargo (default: [])
+features = ["all", "alloc", "signal"]
