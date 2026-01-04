@@ -2,11 +2,11 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::CInt;
+use core::ffi::c_int;
 
 /// Rust implementation of C library function `abs`
 #[cfg_attr(feature = "abs", no_mangle)]
-pub extern "C" fn abs(i: CInt) -> CInt {
+pub extern "C" fn abs(i: c_int) -> c_int {
 	i.abs()
 }
 

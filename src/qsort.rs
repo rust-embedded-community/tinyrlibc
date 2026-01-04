@@ -5,11 +5,11 @@
 
 use core::num::NonZeroUsize;
 
-use crate::{CChar, CInt, CSizeT, CVoid};
+use core::ffi::{c_char, c_int, c_void};
 
-const MAXDEPTH_MULTIPLIER: CSizeT = 2;
-const INSERTION_THRESHOLD: CSizeT = 16;
-const SWAP_BUFFER_SIZE: CSizeT = 128;
+const MAXDEPTH_MULTIPLIER: usize = 2;
+const INSERTION_THRESHOLD: usize = 16;
+const SWAP_BUFFER_SIZE: usize = 128;
 
 /// Rust implementation of C library function `qsort`
 ///
@@ -19,25 +19,25 @@ const SWAP_BUFFER_SIZE: CSizeT = 128;
 /// fast average performance and (asymptotically) optimal worst-case performance.
 #[cfg_attr(feature = "qsort", no_mangle)]
 pub unsafe extern "C" fn qsort(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	compar: Option<extern "C" fn(*const CVoid, *const CVoid) -> CInt>,
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	compar: Option<extern "C" fn(*const c_void, *const c_void) -> c_int>,
 ) {
 	if let Some(comp) = compar {
 		if nel > 0 {
-			let maxdepth = MAXDEPTH_MULTIPLIER * nel.ilog2() as CSizeT;
+			let maxdepth = MAXDEPTH_MULTIPLIER * nel.ilog2() as usize;
 			introsort_helper(base, nel, width, maxdepth, comp);
 		}
 	}
 }
 
 fn introsort_helper(
-	mut base: *mut CVoid,
-	mut nel: CSizeT,
-	width: CSizeT,
-	mut maxdepth: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
+	mut base: *mut c_void,
+	mut nel: usize,
+	width: usize,
+	mut maxdepth: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
 ) {
 	// This loop is a trick to save stack space because TCO is not a thing in Rustland.
 	// Basically, we just change the arguments and loop rather than recursing for the second call
@@ -69,16 +69,16 @@ fn introsort_helper(
 }
 
 fn insertion_sort(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
 ) {
 	for i in 0..nel {
 		for j in (0..i).rev() {
 			let current = unsafe { base.add(j * width) };
 			let prev = unsafe { base.add((j + 1) * width) };
-			if comp(current as *const CVoid, prev as *const CVoid) > 0 {
+			if comp(current as *const c_void, prev as *const c_void) > 0 {
 				swap(current, prev, width);
 			} else {
 				break;
@@ -88,10 +88,10 @@ fn insertion_sort(
 }
 
 fn heapsort(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
 ) {
 	heapify(base, nel, width, comp);
 
@@ -105,10 +105,10 @@ fn heapsort(
 }
 
 fn heapify(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
 ) {
 	// we start at the last parent in the heap (the parent of the last child)
 	let last_parent = (nel - 2) / 2;
@@ -119,11 +119,11 @@ fn heapify(
 }
 
 fn heap_sift_down(
-	base: *mut CVoid,
-	start: CSizeT,
-	end: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
+	base: *mut c_void,
+	start: usize,
+	end: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
 ) {
 	// get the left child of the node at the given index
 	let left_child = |idx| 2 * idx + 1;
@@ -139,11 +139,11 @@ fn heap_sift_down(
 		let first_child_ptr = unsafe { base.add(child * width) };
 		let second_child_ptr = unsafe { base.add((child + 1) * width) };
 
-		if comp(swap_ptr as *const CVoid, first_child_ptr as *const CVoid) < 0 {
+		if comp(swap_ptr as *const c_void, first_child_ptr as *const c_void) < 0 {
 			swap_idx = child;
 			swap_ptr = first_child_ptr;
 		}
-		if child < end && comp(swap_ptr as *const CVoid, second_child_ptr as *const CVoid) < 0 {
+		if child < end && comp(swap_ptr as *const c_void, second_child_ptr as *const c_void) < 0 {
 			swap_idx = child + 1;
 			swap_ptr = second_child_ptr;
 		}
@@ -159,11 +159,11 @@ fn heap_sift_down(
 
 #[inline]
 fn partition(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
-) -> (CSizeT, CSizeT) {
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
+) -> (usize, usize) {
 	// calculate the median of the first, middle, and last elements and use it as the pivot
 	// to do fewer comparisons, also swap the elements into their correct positions
 	let mut pivot = median_of_three(base, nel, width, comp);
@@ -179,7 +179,7 @@ fn partition(
 		let n_ptr = unsafe { base.add(n * width) };
 		let pivot_ptr = unsafe { base.add(pivot * width) };
 
-		let comparison = comp(j_ptr as *const CVoid, pivot_ptr as *const CVoid);
+		let comparison = comp(j_ptr as *const c_void, pivot_ptr as *const c_void);
 		match comparison.cmp(&0) {
 			core::cmp::Ordering::Less => {
 				swap(i_ptr, j_ptr, width);
@@ -206,21 +206,21 @@ fn partition(
 }
 
 fn median_of_three(
-	base: *mut CVoid,
-	nel: CSizeT,
-	width: CSizeT,
-	comp: extern "C" fn(*const CVoid, *const CVoid) -> CInt,
-) -> CSizeT {
+	base: *mut c_void,
+	nel: usize,
+	width: usize,
+	comp: extern "C" fn(*const c_void, *const c_void) -> c_int,
+) -> usize {
 	let pivot = nel / 2;
 
 	let mid = unsafe { base.add(pivot * width) };
 	let last = unsafe { base.add((nel - 1) * width) };
-	if comp(mid as *const CVoid, base as *const CVoid) < 0 {
+	if comp(mid as *const c_void, base as *const c_void) < 0 {
 		swap(mid, base, width);
 	}
-	if comp(last as *const CVoid, mid as *const CVoid) < 0 {
+	if comp(last as *const c_void, mid as *const c_void) < 0 {
 		swap(mid, last, width);
-		if comp(mid as *const CVoid, base as *const CVoid) < 0 {
+		if comp(mid as *const c_void, base as *const c_void) < 0 {
 			swap(mid, base, width);
 		}
 	}
@@ -229,20 +229,20 @@ fn median_of_three(
 }
 
 #[inline]
-fn swap(ptr1: *mut CVoid, ptr2: *mut CVoid, mut width: CSizeT) {
+fn swap(ptr1: *mut c_void, ptr2: *mut c_void, mut width: usize) {
 	use core::mem;
 
-	let mut ptr1 = ptr1 as *mut CChar;
-	let mut ptr2 = ptr2 as *mut CChar;
+	let mut ptr1 = ptr1 as *mut c_char;
+	let mut ptr2 = ptr2 as *mut c_char;
 
 	if ptr1 == ptr2 {
 		return;
 	}
 
-	let mut buffer = mem::MaybeUninit::<[CChar; SWAP_BUFFER_SIZE]>::uninit();
+	let mut buffer = mem::MaybeUninit::<[c_char; SWAP_BUFFER_SIZE]>::uninit();
 	while width > 0 {
 		let copy_size = SWAP_BUFFER_SIZE.min(width);
-		let buf = buffer.as_mut_ptr() as *mut CChar;
+		let buf = buffer.as_mut_ptr() as *mut c_char;
 
 		unsafe {
 			buf.copy_from_nonoverlapping(ptr1, copy_size);
@@ -252,7 +252,7 @@ fn swap(ptr1: *mut CVoid, ptr2: *mut CVoid, mut width: CSizeT) {
 			ptr1 = ptr1.add(copy_size);
 			ptr2 = ptr2.add(copy_size);
 		}
-		width -= copy_size as CSizeT;
+		width -= copy_size as usize;
 	}
 }
 
@@ -260,7 +260,7 @@ fn swap(ptr1: *mut CVoid, ptr2: *mut CVoid, mut width: CSizeT) {
 mod tests {
 	use super::*;
 
-	extern "C" fn comp(a: *const CVoid, b: *const CVoid) -> CInt {
+	extern "C" fn comp(a: *const c_void, b: *const c_void) -> c_int {
 		unsafe { *(a as *const i32) - *(b as *const i32) }
 	}
 
@@ -271,9 +271,9 @@ mod tests {
 
 		unsafe {
 			qsort(
-				array.as_mut_ptr() as *mut CVoid,
-				array.len() as CSizeT,
-				std::mem::size_of::<i32>() as CSizeT,
+				array.as_mut_ptr() as *mut c_void,
+				array.len() as usize,
+				std::mem::size_of::<i32>() as usize,
 				Some(comp),
 			);
 		}
@@ -287,9 +287,9 @@ mod tests {
 		let orig = array.clone();
 
 		heapsort(
-			array.as_mut_ptr() as *mut CVoid,
-			array.len() as CSizeT,
-			std::mem::size_of::<i32>() as CSizeT,
+			array.as_mut_ptr() as *mut c_void,
+			array.len() as usize,
+			std::mem::size_of::<i32>() as usize,
 			comp,
 		);
 
@@ -304,9 +304,9 @@ mod tests {
 
 		unsafe {
 			qsort(
-				array.as_mut_ptr() as *mut CVoid,
-				array.len() as CSizeT,
-				std::mem::size_of::<i32>() as CSizeT,
+				array.as_mut_ptr() as *mut c_void,
+				array.len() as usize,
+				std::mem::size_of::<i32>() as usize,
 				Some(comp),
 			)
 		}
@@ -321,9 +321,9 @@ mod tests {
 		let orig: Vec<_> = (0..1000).collect();
 
 		heapsort(
-			array.as_mut_ptr() as *mut CVoid,
-			array.len() as CSizeT,
-			std::mem::size_of::<i32>() as CSizeT,
+			array.as_mut_ptr() as *mut c_void,
+			array.len() as usize,
+			std::mem::size_of::<i32>() as usize,
 			comp,
 		);
 
@@ -343,9 +343,9 @@ mod tests {
 		let mut array = RAND_ARRAY.clone();
 		unsafe {
 			qsort(
-				array.as_mut_ptr() as *mut CVoid,
-				array.len() as CSizeT,
-				std::mem::size_of::<i32>() as CSizeT,
+				array.as_mut_ptr() as *mut c_void,
+				array.len() as usize,
+				std::mem::size_of::<i32>() as usize,
 				Some(comp),
 			)
 		}
@@ -357,9 +357,9 @@ mod tests {
 	fn random_heapsort() {
 		let mut array = RAND_ARRAY.clone();
 		heapsort(
-			array.as_mut_ptr() as *mut CVoid,
-			array.len() as CSizeT,
-			std::mem::size_of::<i32>() as CSizeT,
+			array.as_mut_ptr() as *mut c_void,
+			array.len() as usize,
+			std::mem::size_of::<i32>() as usize,
 			comp,
 		);
 

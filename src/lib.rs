@@ -11,10 +11,6 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(unused_imports)]
 
-// Useful imports
-mod ctype;
-pub use self::ctype::*;
-
 // Stateless implementations.
 // rustfmt will keep these in alphabetical order.
 mod abs;
