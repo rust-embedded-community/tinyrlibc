@@ -3,11 +3,11 @@
 //! Copyright (c) Ferrous Systems UK Ltd
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::{CChar, CInt};
+use core::ffi::{c_char, c_int};
 
 /// Rust implementation of C library function `strcspn`
 #[cfg_attr(feature = "strcspn", no_mangle)]
-pub unsafe extern "C" fn strcspn(s: *const CChar, charset: *const CChar) -> usize {
+pub unsafe extern "C" fn strcspn(s: *const c_char, charset: *const c_char) -> usize {
 	if s.is_null() {
 		return 0;
 	}

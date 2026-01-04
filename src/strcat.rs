@@ -2,13 +2,13 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::CChar;
+use core::ffi::c_char;
 
 /// Rust implementation of C library function `strcat`.
 ///
 /// Passing NULL (core::ptr::null()) gives undefined behaviour.
 #[cfg_attr(feature = "strcat", no_mangle)]
-pub unsafe extern "C" fn strcat(dest: *mut CChar, src: *const CChar) -> *const CChar {
+pub unsafe extern "C" fn strcat(dest: *mut c_char, src: *const c_char) -> *const c_char {
 	crate::strcpy::strcpy(dest.add(crate::strlen::strlen(dest)), src);
 	dest
 }
@@ -21,9 +21,9 @@ mod test {
 	fn simple() {
 		let mut dest = *b"hello\0\0\0\0\0\0\0\0";
 		let src = *b" world\0";
-		let result = unsafe { strcat(dest.as_mut_ptr(), src.as_ptr()) };
+		let result = unsafe { strcat(dest.as_mut_ptr().cast(), src.as_ptr().cast()) };
 		assert_eq!(
-			unsafe { core::slice::from_raw_parts(result, 12) },
+			unsafe { core::slice::from_raw_parts(result as *const u8, 12) },
 			b"hello world\0"
 		);
 	}

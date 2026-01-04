@@ -5,6 +5,7 @@ authors = ["Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"]
 edition = "2021"
 description = "Tiny, incomplete C library for bare-metal targets, written in Stable (but Unsafe) Rust"
 license-file = "LICENCES.md"
+rust-version = "1.77"
 readme = "README.md"
 repository = "https://github.com/rust-embedded-community/tinyrlibc"
 

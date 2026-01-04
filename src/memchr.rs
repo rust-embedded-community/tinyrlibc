@@ -2,15 +2,15 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::{CChar, CInt, CSizeT, CVoid};
+use core::ffi::{c_char, c_int, c_void};
 
 /// Rust implementation of C library function `memchr`
 #[cfg_attr(feature = "memchr", no_mangle)]
-pub unsafe extern "C" fn memchr(s: *const CVoid, c: CInt, n: CSizeT) -> *const CVoid {
-	let s = s as *const CChar;
+pub unsafe extern "C" fn memchr(s: *const c_void, c: c_int, n: usize) -> *const c_void {
+	let s = s as *const c_char;
 	for i in 0..n {
-		if *s.add(i) as CInt == c {
-			return s.add(i) as *const CVoid;
+		if *s.add(i) as c_int == c {
+			return s.add(i) as *const c_void;
 		}
 	}
 	core::ptr::null()
@@ -29,8 +29,8 @@ mod test {
 	fn normal() {
 		let s = b"hello world";
 		assert_eq!(
-			unsafe { memchr(s.as_ptr() as *const CVoid, b'w' as CInt, s.len() as CSizeT) },
-			unsafe { s.as_ptr().offset(6) } as *const CVoid
+			unsafe { memchr(s.as_ptr() as *const c_void, b'w' as c_int, s.len() as usize) },
+			unsafe { s.as_ptr().offset(6) } as *const c_void
 		);
 	}
 
@@ -38,7 +38,7 @@ mod test {
 	fn not_found() {
 		let s = b"hello world";
 		assert_eq!(
-			unsafe { memchr(s.as_ptr() as *const CVoid, b'x' as CInt, s.len() as CSizeT) },
+			unsafe { memchr(s.as_ptr() as *const c_void, b'x' as c_int, s.len() as usize) },
 			core::ptr::null()
 		)
 	}

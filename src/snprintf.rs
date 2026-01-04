@@ -6,21 +6,22 @@
 #[cfg(test)]
 mod test {
 	extern "C" {
-		fn snprintf(buf: *mut CChar, len: usize, fmt: *const CChar, ...) -> i32;
+		fn snprintf(buf: *mut c_char, len: usize, fmt: *const c_char, ...) -> i32;
 	}
 
 	use core::{ffi::CStr, fmt};
 	use std::fmt::format;
 
-	use crate::{strcmp::strcmp, CChar, CInt, CLong, CLongLong, CUInt, CULong, CULongLong};
+	use crate::strcmp::strcmp;
+	use core::ffi::{c_char, c_int, c_long, c_longlong, c_uint, c_ulong, c_ulonglong};
 
-	/// Make it easier to turn `c"Hello"` into a `*const CChar`
+	/// Make it easier to turn `c"Hello"` into a `*const c_char`
 	trait ToByte {
-		fn cp(&self) -> *const CChar;
+		fn cp(&self) -> *const c_char;
 	}
 
 	impl ToByte for &std::ffi::CStr {
-		fn cp(&self) -> *const CChar {
+		fn cp(&self) -> *const c_char {
 			self.as_ptr().cast()
 		}
 	}
@@ -29,11 +30,11 @@ mod test {
 	#[track_caller]
 	fn asprintf<F>(fmt: &str, expected: &str, f: F)
 	where
-		F: FnOnce(*mut CChar, usize, *const CChar) -> i32,
+		F: FnOnce(*mut c_char, usize, *const c_char) -> i32,
 	{
 		let mut buf = vec![0u8; 128];
 		let cfmt = std::ffi::CString::new(fmt).unwrap();
-		let res = f(buf.as_mut_ptr(), buf.len(), cfmt.as_ptr().cast());
+		let res = f(buf.as_mut_ptr().cast(), buf.len(), cfmt.as_ptr().cast());
 		if res < 0 {
 			panic!("closure returned {}", res);
 		}
@@ -80,15 +81,15 @@ mod test {
 					buf,
 					len,
 					fmt,
-					CUInt::from(100u8),
-					CULong::from(100u8),
-					CULongLong::from(100u8),
-					CInt::from(-100i8),
-					CLong::from(-100i8),
-					CLongLong::from(-100i8),
-					CUInt::from(0xcafe1234u32),
-					CULong::from(0xcafe1234u32),
-					CULongLong::from(0xcafe1234u32),
+					c_uint::from(100u8),
+					c_ulong::from(100u8),
+					c_ulonglong::from(100u8),
+					c_int::from(-100i8),
+					c_long::from(-100i8),
+					c_longlong::from(-100i8),
+					c_uint::from(0xcafe1234u32),
+					c_ulong::from(0xcafe1234u32),
+					c_ulonglong::from(0xcafe1234u32),
 				)
 			},
 		);
@@ -98,13 +99,13 @@ mod test {
 	fn int_min() {
 		asprintf(
 			"%d",
-			&format!("{}", CInt::min_value()),
-			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CInt::min_value()) },
+			&format!("{}", c_int::min_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, c_int::min_value()) },
 		);
 		asprintf(
 			"%lld",
-			&format!("{}", CLongLong::min_value()),
-			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CLongLong::min_value()) },
+			&format!("{}", c_longlong::min_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, c_longlong::min_value()) },
 		);
 	}
 
@@ -112,19 +113,19 @@ mod test {
 	fn int_max() {
 		asprintf(
 			"%d",
-			&format!("{}", CInt::max_value()),
-			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CInt::max_value()) },
+			&format!("{}", c_int::max_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, c_int::max_value()) },
 		);
 		asprintf(
 			"%lld",
-			&format!("{}", CLongLong::max_value()),
-			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, CLongLong::max_value()) },
+			&format!("{}", c_longlong::max_value()),
+			|buf, len, fmt| unsafe { snprintf(buf, len, fmt, c_longlong::max_value()) },
 		);
 	}
 
 	#[test]
 	fn non_null_terminated_with_length() {
-		asprintf("%.*s", "01234", |buf, len, fmt: *const u8| unsafe {
+		asprintf("%.*s", "01234", |buf, len, fmt| unsafe {
 			snprintf(buf, len, fmt, 5, c"01234567890123456789".cp())
 		});
 		asprintf("%.10s", "0123456789", |buf, len, fmt| unsafe {
@@ -135,154 +136,154 @@ mod test {
 	#[test]
 	fn number_with_padding() {
 		asprintf("%5u", "  123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%5lu", "  123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULong::from(123u8))
+			snprintf(buf, len, fmt, c_ulong::from(123u8))
 		});
 		asprintf("%5llu", "  123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULongLong::from(123u8))
+			snprintf(buf, len, fmt, c_ulonglong::from(123u8))
 		});
 		asprintf("%5d", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%5ld", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CLong::from(-123i8))
+			snprintf(buf, len, fmt, c_long::from(-123i8))
 		});
 		asprintf("%5lld", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CLongLong::from(-123i8))
+			snprintf(buf, len, fmt, c_longlong::from(-123i8))
 		});
 		asprintf("%10x", "  cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_uint::from(0xcafe1234u32))
 		});
 		asprintf("%10lx", "  cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULong::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_ulong::from(0xcafe1234u32))
 		});
 		asprintf("%10llX", "  CAFE1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULongLong::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_ulonglong::from(0xcafe1234u32))
 		});
 	}
 
 	#[test]
 	fn number_with_zero_padding() {
 		asprintf("%05u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%05lu", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULong::from(123u8))
+			snprintf(buf, len, fmt, c_ulong::from(123u8))
 		});
 		asprintf("%05llu", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULongLong::from(123u8))
+			snprintf(buf, len, fmt, c_ulonglong::from(123u8))
 		});
 		asprintf("%05d", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%05ld", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CLong::from(-123i8))
+			snprintf(buf, len, fmt, c_long::from(-123i8))
 		});
 		asprintf("%05lld", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CLongLong::from(-123i8))
+			snprintf(buf, len, fmt, c_longlong::from(-123i8))
 		});
 		asprintf("%010x", "00cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_uint::from(0xcafe1234u32))
 		});
 		asprintf("%010lx", "00cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULong::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_ulong::from(0xcafe1234u32))
 		});
 		asprintf("%010llX", "00CAFE1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CULongLong::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_ulonglong::from(0xcafe1234u32))
 		});
 	}
 
 	#[test]
 	fn number_with_precision() {
 		asprintf("%.5u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%.5d", "-00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%.10x", "00cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_uint::from(0xcafe1234u32))
 		});
 		asprintf("%.4d", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%.3d", "-123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%.2u", "123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%.0u", "123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 	}
 
 	#[test]
 	fn number_with_width_and_precision() {
 		asprintf("%10.5u", "     00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%10.5d", "    -00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%15.10x", "     00cafe1234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(0xcafe1234u32))
+			snprintf(buf, len, fmt, c_uint::from(0xcafe1234u32))
 		});
 
 		asprintf("%5.5u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%4.5u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%2.5u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%0.5u", "00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%5.4u", " 0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%5.3u", "  123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 		asprintf("%5.0u", "  123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CUInt::from(123u8))
+			snprintf(buf, len, fmt, c_uint::from(123u8))
 		});
 
 		asprintf("%5.5d", "-00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%4.5d", "-00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%2.5d", "-00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%0.5d", "-00123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%5.4d", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%5.3d", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%5.0d", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 
 		asprintf("%05.4d", "-0123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%05.3d", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 		asprintf("%05.0d", " -123", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, CInt::from(-123i8))
+			snprintf(buf, len, fmt, c_int::from(-123i8))
 		});
 	}
 }

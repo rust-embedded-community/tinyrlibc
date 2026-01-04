@@ -2,13 +2,13 @@
 //!
 //! Licensed under the Blue Oak Model Licence 1.0.0
 
-use crate::CChar;
+use core::ffi::c_char;
 
 /// Rust implementation of C library function `strcpy`.
 ///
 /// Passing NULL (core::ptr::null()) gives undefined behaviour.
 #[cfg_attr(feature = "strcpy", no_mangle)]
-pub unsafe extern "C" fn strcpy(dest: *mut CChar, src: *const CChar) -> *const CChar {
+pub unsafe extern "C" fn strcpy(dest: *mut c_char, src: *const c_char) -> *const c_char {
 	let mut i = 0;
 	loop {
 		*dest.offset(i) = *src.offset(i);
@@ -27,11 +27,11 @@ mod test {
 
 	#[test]
 	fn short() {
-		let src = b"hi\0";
+		let src = c"hi";
 		let mut dest = *b"abcdef"; // no null terminator
-		let result = unsafe { strcpy(dest.as_mut_ptr(), src.as_ptr()) };
+		let result = unsafe { strcpy(dest.as_mut_ptr().cast(), src.as_ptr()) };
 		assert_eq!(
-			unsafe { core::slice::from_raw_parts(result, 6) },
+			unsafe { core::slice::from_raw_parts(result as *const u8, 6) },
 			*b"hi\0def"
 		);
 	}
