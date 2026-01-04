@@ -25,7 +25,7 @@ pub unsafe extern "C" fn itoa(i: i64, s: *mut c_char, s_len: usize, radix: u8) -
 	};
 
 	if is_negative && (s_len > 0) {
-		core::ptr::write(s, b'-' as i8);
+		core::ptr::write(s, b'-' as c_char);
 		utoa(pos_i, s.offset(1), s_len - 1, radix)
 	} else {
 		utoa(pos_i, s, s_len, radix)
@@ -47,11 +47,11 @@ pub unsafe extern "C" fn utoa(mut u: u64, s: *mut c_char, s_len: usize, radix: u
 	// Build the number up in buffer s in reverse order
 	let mut index = 0usize;
 	for slot in buffer_slice.iter_mut() {
-		let digit = (u % radix as u64) as i8;
+		let digit = (u % radix as u64) as c_char;
 		if digit <= 9 {
-			*slot = digit + (b'0' as i8);
+			*slot = digit + (b'0' as c_char);
 		} else {
-			*slot = digit - 10 + (b'a' as i8);
+			*slot = digit - 10 + (b'a' as c_char);
 		}
 		index += 1;
 		u /= radix as u64;
