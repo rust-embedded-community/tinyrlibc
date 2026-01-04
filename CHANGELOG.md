@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## v0.5.1 (2026-01-04)
+
+* [#38] - Enable all features on `docs.rs`
+
+[#38]: https://github.com/rust-embedded-community/tinyrlibc/pull/26
+
 ## v0.5.0 (2024-11-29)
 
 * [#26] - Add `memchr` 

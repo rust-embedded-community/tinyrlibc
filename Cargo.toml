@@ -1,6 +1,6 @@
 [package]
 name = "tinyrlibc"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"]
 edition = "2021"
 description = "Tiny, incomplete C library for bare-metal targets, written in Stable (but Unsafe) Rust"
