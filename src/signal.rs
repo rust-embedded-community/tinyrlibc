@@ -126,7 +126,7 @@ mod tests {
 	}
 
 	impl State {
-		fn lock(&self) -> std::sync::MutexGuard<()> {
+		fn lock(&self) -> std::sync::MutexGuard<'_, ()> {
 			// Ensure we have exclusive access
 			let guard = self.inner.lock().unwrap();
 			// Reset the global signal handler list to defaults
