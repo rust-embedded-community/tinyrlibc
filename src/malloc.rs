@@ -4,7 +4,6 @@
 //! This file is licensed under the Blue Oak Model Licence 1.0.0
 
 extern crate alloc;
-use crate::usize;
 
 // The maximum alignment of any fundamental type. Equivalent to max_align_t
 const MAX_ALIGN: usize = 16;
