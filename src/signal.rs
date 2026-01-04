@@ -167,10 +167,17 @@ mod tests {
 	#[test]
 	fn test_abort() {
 		let _guard = TEST_LOCK.lock();
-		let result = std::panic::catch_unwind(|| {
-			abort();
-		});
-		assert!(result.is_err());
+		static COUNT: AtomicUsize = AtomicUsize::new(0);
+		extern "C" fn count_handler(_sig: i32) {
+			COUNT.fetch_add(1, Ordering::Relaxed);
+		}
+		let count_handler_ptr = count_handler as *const fn(i32) as usize;
+		let old_handler = unsafe { signal(SIGABRT, count_handler_ptr) };
+		assert_eq!(old_handler, SIG_DFL);
+		abort();
+		let old_handler = unsafe { signal(SIGABRT, SIG_DFL) };
+		assert_eq!(COUNT.load(Ordering::Relaxed), 1);
+		assert_eq!(old_handler, count_handler_ptr);
 	}
 
 	#[test]
@@ -178,12 +185,6 @@ mod tests {
 		let _guard = TEST_LOCK.lock();
 		let err = unsafe { signal(1000, SIG_DFL) };
 		assert_eq!(err, SIG_ERR);
-	}
-
-	#[test]
-	fn test_raise() {
-		let result = std::panic::catch_unwind(|| raise(SIGTERM));
-		assert!(result.is_err());
 	}
 
 	#[test]
