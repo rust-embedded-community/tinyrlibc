@@ -15,17 +15,6 @@ mod test {
 	use crate::strcmp::strcmp;
 	use core::ffi::{c_char, c_int, c_long, c_longlong, c_uint, c_ulong, c_ulonglong};
 
-	/// Make it easier to turn `c"Hello"` into a `*const c_char`
-	trait ToByte {
-		fn cp(&self) -> *const c_char;
-	}
-
-	impl ToByte for &std::ffi::CStr {
-		fn cp(&self) -> *const c_char {
-			self.as_ptr().cast()
-		}
-	}
-
 	/// Handle the buffer that `snprintf` needs
 	#[track_caller]
 	fn asprintf<F>(fmt: &str, expected: &str, f: F)
@@ -60,7 +49,7 @@ mod test {
 	#[test]
 	fn strings() {
 		asprintf("%s, %s!", "Hello, World!", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, c"Hello".cp(), c"World".cp())
+			snprintf(buf, len, fmt, c"Hello".as_ptr(), c"World".as_ptr())
 		});
 	}
 
@@ -126,10 +115,10 @@ mod test {
 	#[test]
 	fn non_null_terminated_with_length() {
 		asprintf("%.*s", "01234", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, 5, c"01234567890123456789".cp())
+			snprintf(buf, len, fmt, 5, c"01234567890123456789".as_ptr())
 		});
 		asprintf("%.10s", "0123456789", |buf, len, fmt| unsafe {
-			snprintf(buf, len, fmt, c"01234567890123456789".cp())
+			snprintf(buf, len, fmt, c"01234567890123456789".as_ptr())
 		});
 	}
 
