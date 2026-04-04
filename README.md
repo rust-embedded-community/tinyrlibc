@@ -61,3 +61,6 @@ This crate basically came about so that the [nrfxlib](https://github.com/NordicP
 
 As this is going to be a bunch of bits taken from all over the place (some newlib, some relibc, etc), each function has its own file and each file has its own licence. Any new licences should be appended to the [LICENCE.md](./LICENCE.md) file.
 
+## Contributing
+
+Contributions must be in accordance with the notices in [CONTRIBUTING.md](./CONTRIBUTING.md).
